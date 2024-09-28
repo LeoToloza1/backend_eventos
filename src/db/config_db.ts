@@ -11,7 +11,9 @@ class Conectar {
   private static instancia: Conectar;
   private conexion: Connection | null = null;
 
-  private constructor() {}
+  private constructor() {
+    this.conectar();
+  }
 
   /**
    * Retorna la instancia de Conectar, creandola si no existe.

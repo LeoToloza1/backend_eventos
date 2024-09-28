@@ -15,7 +15,6 @@ class Asistente implements IAsistente {
    * @param {string} email - El email del asistente.
    * @param {number} telefono - El tel fono del asistente.
    * @param {number} dni - El DNI del asistente.
-   * @throws {Error} - Si el email no es v lido.
    */
   constructor(
     id: number,
@@ -25,9 +24,6 @@ class Asistente implements IAsistente {
     telefono: number,
     dni: number
   ) {
-    if (!this.validarEmail(email)) {
-      throw new Error("El email no es válido");
-    }
     this.id = id;
     this.nombre = nombre;
     this.apellido = apellido;
@@ -35,18 +31,6 @@ class Asistente implements IAsistente {
     this.telefono = telefono;
     this.dni = dni;
   }
-
-  /**
-   * Valida si el email es v lido.
-   *
-   * @param {string} email - El email a validar.
-   * @returns {boolean} - `true` si el email es v lido, `false` en caso contrario.
-   */
-  validarEmail(email: string): boolean {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  }
-
   /**
    * Obtiene el nombre completo del asistente.
    *

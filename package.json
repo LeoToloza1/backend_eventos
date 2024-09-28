@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "console-ninja nodemon --exec tsx ./src/index.ts",
+    "dev": "nodemon --exec tsx ./src/index.ts",
     "tsc": "tsc",
     "start": "console-ninja node ./salida/index.js"
   },

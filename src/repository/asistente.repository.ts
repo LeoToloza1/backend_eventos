@@ -36,6 +36,7 @@ class RepoAsistente implements ICrud<Asistente> {
         "SELECT * FROM asistentes WHERE id = ?",
         [id]
       );
+      //TODO deberia manejar la posibilidad de retornar null con un status code o con mensajes de error
       if (resultados.length === 0) {
         return null;
       }

@@ -1,7 +1,7 @@
 interface IMetodosHttp<T> {
-  getAll: (url: string, params?: any) => Promise<T[]>;
-  getId: (url: string, params?: any) => Promise<T | null>;
-  post: (url: string, params?: any) => Promise<T>;
-  put: (url: string, params: any) => Promise<T | null>;
-  patch: (url: string, params: any) => Promise<T | null>;
+  getAll: (req: Request, res: Response) => Promise<Response[]>;
+  getId: (req: Request, res: Response) => Promise<T | null>;
+  post: (req: Request, res: Response) => Promise<T>;
+  put: (req: Request, res: Response) => Promise<T | null>;
+  patch: (req: Request, res: Response) => Promise<T | null>;
 }
