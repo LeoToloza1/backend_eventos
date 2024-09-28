@@ -1,11 +1,18 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express } from "express";
 import Conectar from "./db/config_db";
 import { config } from "dotenv";
 import morgan from "morgan";
+import AsistenteRouter from "./routes/asistentes.router";
 
 class Servidor {
   private app: Express;
 
+  /**
+   * Constructor de la clase Servidor.
+   *
+   * Inicializa la app de express, configura los middlewares, las rutas y
+   * conecta a la base de datos.
+   */
   constructor() {
     this.app = express();
     this.configurarMiddlewares();
@@ -13,6 +20,16 @@ class Servidor {
     this.iniciarBaseDeDatos();
   }
 
+  /**
+   * Configura los middlewares de la aplicaci n.
+   *
+   * Los middlewares configurados son:
+   *
+   * - morgan para registrar las peticiones en la consola.
+   * - express.json() para parsear el cuerpo de las peticiones en formato json.
+   * - express.urlencoded() para parsear el cuerpo de las peticiones en formato urlencoded.
+   * - express.static() para servir archivos est ticos en el directorio "public".
+   */
   private configurarMiddlewares() {
     config();
     this.app.use(morgan("dev"));
@@ -20,33 +37,43 @@ class Servidor {
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(express.static("public"));
   }
-  private async configurarRutas() {
-    this.app.get("/", async (_req: Request, res: Response) => {
-      try {
-        const db = Conectar.obtenerInstancia();
-        await db.conectar();
-        const resultados = await db.consultar("SELECT * FROM asistentes");
-        console.log(resultados);
-        res.json(resultados);
-      } catch (error) {
-        console.error("Error al consultar la base de datos:", error);
-        res.status(500).json({ error: "Error al consultar la base de datos" });
-      }
-    });
+  /**
+   * Configura las rutas de la aplicaci n.
+   *
+   * Configura la ruta "/asistentes" para que se maneje con el router
+   * AsistenteRouter.
+   */
+  private configurarRutas() {
+    const asistenteRouter = new AsistenteRouter();
+    this.app.use("/asistentes", asistenteRouter.getRouter());
   }
 
+  /**
+   * Inicializa la base de datos.
+   *
+   * La inicializacion de la base de datos se hace a traves de la
+   * instancia de Conectar. Si ocurre un error al conectar a la base
+   * de datos, se registra en la consola y se termina la ejecucion
+   * de la aplicacion con codigo de estado 1.
+   */
   private async iniciarBaseDeDatos() {
     try {
       const db = Conectar.obtenerInstancia();
-      await db.conectar(); // Conectar a la base de datos solo una vez
-      console.log(
-        "Conexión a la base de datos establecida en el inicio del servidor."
-      );
+      await db.conectar();
     } catch (error) {
       console.error("Error al conectar a la base de datos:", error);
-      process.exit(1); // Salir si no se puede conectar a la base de datos
+      process.exit(1);
     }
   }
+
+  /**
+   * Inicia el servidor.
+   *
+   * Inicia el servidor en el puerto especificado en la variable de
+   * entorno "PORT" o en el puerto 3000 si no est  definida.
+   *
+   * @returns {void}
+   */
   public iniciar() {
     const puerto = process.env.PORT || 3000;
     this.app.listen(puerto, () => {
