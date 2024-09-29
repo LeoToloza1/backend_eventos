@@ -31,14 +31,14 @@ class RepoAsistente implements ICrud<IAsistente>, IMapeo<IAsistente> {
    * @throws {Error} - Si ocurre un error al buscar el asistente con el id
    *                  especificado.
    */
-  async buscarPorId(id: number): Promise<IAsistente | boolean> {
+  async buscarPorId(id: number): Promise<IAsistente | null> {
     try {
       const resultados = await this.db.consultar(
         "SELECT * FROM asistentes WHERE id = ?",
         [id]
       );
       if (resultados.length === 0) {
-        return false;
+        return null;
       }
       return this.mapearResultados(resultados)[0];
     } catch (error) {
@@ -55,7 +55,7 @@ class RepoAsistente implements ICrud<IAsistente>, IMapeo<IAsistente> {
    * @returns {Promise<IAsistente>} - El objeto Asistente creado.
    * @throws {Error} - Si ocurre un error al crear el asistente.
    */
-  async crear(item: IAsistente): Promise<IAsistente | boolean> {
+  async crear(item: IAsistente): Promise<IAsistente | null> {
     try {
       const sql =
         "INSERT INTO asistentes (nombre, apellido, email, telefono, dni) VALUES (?, ?, ?, ?, ?)";
@@ -64,7 +64,7 @@ class RepoAsistente implements ICrud<IAsistente>, IMapeo<IAsistente> {
       return item; //devuelve el asistente creado
     } catch (error) {
       console.error("Error al crear el asistente:", error);
-      return false;
+      return null;
     }
   }
 

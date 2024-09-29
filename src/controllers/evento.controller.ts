@@ -43,8 +43,12 @@ class EventoController {
   async getId(req: Request, res: Response): Promise<void> {
     const { id } = req.params;
     try {
-      const asistente = await this._repoEvento.buscarPorId(Number(id));
-      res.json(asistente);
+      const evento = await this._repoEvento.buscarPorId(Number(id));
+      if (evento === null) {
+        res.status(404).json({ error: "No se encuentra el evento" });
+        return;
+      }
+      res.json(evento);
     } catch (error) {
       console.error(`Error al obtener el evento con id ${id}:`, error);
       res.status(500).json({ error: "Ocurrió al obtener el evento" });

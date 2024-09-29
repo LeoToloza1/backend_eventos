@@ -50,6 +50,11 @@ class AsistenteController {
     const { id } = req.params;
     try {
       const asistente = await this._repoAsistente.buscarPorId(Number(id));
+      if (asistente === null) {
+        res
+          .status(404)
+          .json({ error: "No se encuentra el asistente, intente de nuevo" });
+      }
       res.json(asistente);
     } catch (error) {
       console.error(`Error al obtener asistente con id ${id}:`, error);

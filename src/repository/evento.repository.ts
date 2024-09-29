@@ -11,7 +11,8 @@ class RepoEvento implements ICrud<IEventos>, IMapeo<IEventos> {
    */
   async obtenerTodos(): Promise<IEventos[]> {
     try {
-      const sql = "SELECT * FROM eventos";
+      const sql =
+        "SELECT id,nombre,ubicacion,DATE_FORMAT(fecha, '%d-%m-%y') AS fecha,descripcion,realizado FROM eventos";
       const resultados = await this.db.consultar(sql);
       return this.mapearResultados(resultados);
     } catch (error) {
@@ -23,7 +24,7 @@ class RepoEvento implements ICrud<IEventos>, IMapeo<IEventos> {
    * Busca un evento por su id.
    *
    * @param {number} id - El id del evento a buscar.
-   * @returns {Promise<boolean | IEventos>} - Un objeto IEventos con los
+   * @returns {Promise<null | IEventos>} - Un objeto IEventos con los
    *                                          resultados de la consulta o
    *                                          false si no se encuentra un
    *                                          evento con el id especificado.
@@ -31,17 +32,18 @@ class RepoEvento implements ICrud<IEventos>, IMapeo<IEventos> {
    *                  especificado.
    */
 
-  async buscarPorId(id: number): Promise<boolean | IEventos> {
+  async buscarPorId(id: number): Promise<IEventos | null> {
     try {
-      const sql = "SELECT * FROM eventos WHERE id = ?";
+      const sql =
+        "SELECT id,nombre,ubicacion,DATE_FORMAT(fecha, '%d-%m-%y') AS fecha,descripcion,realizado FROM eventos WHERE id = ?";
       const resultados = await this.db.consultar(sql, [id]);
       if (resultados.length === 0) {
-        return false;
+        return null;
       }
       return this.mapearResultados(resultados)[0];
     } catch (error) {
       console.error(`Error al buscar el evento con id ${id}:`, error);
-      return false;
+      throw new Error("Error al buscar por id un evento");
     }
   }
 
@@ -54,7 +56,7 @@ class RepoEvento implements ICrud<IEventos>, IMapeo<IEventos> {
    *                                          false si ocurre un error.
    * @throws {Error} - Si ocurre un error al crear el evento.
    */
-  async crear(item: IEventos): Promise<boolean | IEventos> {
+  async crear(item: IEventos): Promise<null | IEventos> {
     try {
       const sql =
         "INSERT INTO eventos (nombre, ubicacion, fecha, descripcion, realizado) VALUES (?, ?, ?, ?, ?)";
@@ -69,7 +71,7 @@ class RepoEvento implements ICrud<IEventos>, IMapeo<IEventos> {
       return item;
     } catch (error) {
       console.error("Error al crear el evento:", error);
-      return false;
+      return null;
     }
   }
 
