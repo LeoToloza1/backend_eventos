@@ -69,31 +69,37 @@ class RepoAsistente implements ICrud<IAsistente>, IMapeo<IAsistente> {
   }
 
   /**
-   * Actualiza un asistente en la base de datos.
+   * Actualiza un asistente existente en la base de datos, de manera dinamica
    *
    * @param {number} id - El id del asistente a actualizar.
-   * @param {Asistente} item - El objeto Asistente con los datos actualizados.
-   * @returns {Promise<Asistente | boolean>} - El objeto Asistente actualizado,
-   *                                          o false si ocurre un error.
+   * @param {Partial<IAsistente>} item - Un objeto con las propiedades del
+   *                                    asistente a actualizar.
+   * @returns {Promise<IAsistente | boolean>} - El objeto Asistente actualizado
+   *                                           o false si ocurre un error.
    * @throws {Error} - Si ocurre un error al actualizar el asistente.
    */
   async actualizar(
     id: number,
-    item: IAsistente
+    item: Partial<IAsistente>
   ): Promise<IAsistente | boolean> {
     try {
-      const sql =
-        "UPDATE asistentes SET nombre = ?, apellido = ?, email = ?, telefono = ?, dni = ? WHERE id = ?";
-      const { nombre, apellido, email, telefono, dni } = item;
-      const resultados = await this.db.consultar(sql, [
-        nombre,
-        apellido,
-        email,
-        telefono,
-        dni,
-        id,
-      ]);
-      return this.mapearResultados(resultados)[0];
+      /**
+       * obtener los campos de la consulta a ejecutar de manera dinamica
+       * segun las propiedades que envie el objeto
+       */
+      const campos = Object.keys(item)
+        .filter((key) => item[key as keyof IAsistente] !== undefined)
+        .map((key) => `${key} = ?`);
+      const valores = Object.values(item).filter(
+        (valor) => valor !== undefined
+      );
+
+      if (campos.length === 0) {
+        throw new Error("No hay campos para actualizar");
+      }
+      const sql = `UPDATE asistentes SET ${campos.join(", ")} WHERE id = ?`;
+      await this.db.consultar(sql, [...valores, id]);
+      return true;
     } catch (error) {
       console.error(`Error al actualizar el asistente con id ${id}:`, error);
       return false;
