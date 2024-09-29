@@ -1,4 +1,4 @@
-class Asistente implements IAsistente {
+class Asistente {
   public readonly id: number;
   public nombre: string;
   public apellido: string;
@@ -40,3 +40,5 @@ class Asistente implements IAsistente {
     return `${this.nombre} ${this.apellido}`;
   }
 }
+
+export default Asistente;

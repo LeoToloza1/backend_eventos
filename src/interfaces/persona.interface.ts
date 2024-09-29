@@ -1,5 +1,5 @@
 interface IPersona {
-  id?: number;
+  id: number;
   nombre: string;
   apellido: string;
   email: string;

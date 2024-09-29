@@ -9,6 +9,12 @@ abstract class ServidorAbstract {
   protected asistenteController: AsistenteController;
   protected asistenteRouter: AsistenteRouter;
 
+  /**
+   * Constructor de la clase abstracta ServidorAbstract.
+   * Crea las instancias de los objetos que se van a utilizar
+   * para interactuar con la base de datos y crear el router
+   * de express para la gesti n de asistentes.
+   */
   constructor() {
     this.db = Conectar.obtenerInstancia();
     this.repoAsistente = new RepoAsistente(this.db);

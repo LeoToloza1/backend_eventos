@@ -56,7 +56,7 @@ class Conectar {
           ? process.env.DB_NAME_PRODUCTION
           : process.env.DB_NAME_DESARROLLO,
       };
-
+      // console.log(config_db);
       this.conexion = await mysql.createConnection(config_db);
       console.log("Conexión a la base de datos establecida");
     } catch (error) {
