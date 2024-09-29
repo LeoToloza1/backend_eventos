@@ -21,27 +21,11 @@ class AsistenteRouter {
    * - PATCH /parcial/:id : Actualiza parcialmente un asistente existente en la base de datos.
    */
   private configurarRutas(): void {
-    this.router.get(
-      "/",
-      this.asistenteController.getAll.bind(this.asistenteController)
-    ); //✅
-    this.router.get(
-      "/:id",
-      this.asistenteController.getId.bind(this.asistenteController)
-    ); //✅
-    this.router.post(
-      "/crear",
-      this.asistenteController.post.bind(this.asistenteController)
-    ); //✅
-    this.router.put(
-      "/actualizar/:id",
-      this.asistenteController.put.bind(this.asistenteController)
-    ); //✅
-
-    this.router.patch(
-      "/parcial/:id",
-      this.asistenteController.patch.bind(this.asistenteController)
-    ); //✅
+    this.router.get("/", this.asistenteController.getAll); //✅
+    this.router.get("/:id", this.asistenteController.getId); //✅
+    this.router.post("/crear", this.asistenteController.post); //✅
+    this.router.put("/actualizar/:id", this.asistenteController.put); //✅
+    this.router.patch("/parcial/:id", this.asistenteController.patch); //✅
   }
 
   /**

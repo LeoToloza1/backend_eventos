@@ -13,6 +13,9 @@ class AsistenteController {
     this._repoAsistente = repoAsistente;
     this.getAll = this.getAll.bind(this);
     this.getId = this.getId.bind(this);
+    this.post = this.post.bind(this);
+    this.put = this.put.bind(this);
+    this.patch = this.patch.bind(this);
   }
 
   /**
