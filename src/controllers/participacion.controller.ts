@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
-import RepoAsistente from "../repository/asistente.repository";
+import RepoParticipacion from "../repository/participacion.repository";
 
-class AsistenteController {
-  private readonly _repoAsistente: RepoAsistente;
+class ParticipacionController {
+  private readonly _repoParticipacion: RepoParticipacion;
 
   /**
-   * Constructor de la clase AsistenteController.
+   * Constructor de la clase ParticipacionController.
    *
-   * @param {RepoAsistente} repoAsistente - La instancia del repositorio de asistentes.
+   * @param {RepoParticipacion} RepoParticipacion - La instancia del repositorio de participaciones.
    */
-  constructor(repoAsistente: RepoAsistente) {
-    this._repoAsistente = repoAsistente;
+  constructor(RepoParticipacion: RepoParticipacion) {
+    this._repoParticipacion = RepoParticipacion;
     this.getAll = this.getAll.bind(this);
     this.getId = this.getId.bind(this);
     this.post = this.post.bind(this);
@@ -19,64 +19,67 @@ class AsistenteController {
   }
 
   /**
-   * Obtiene todos los asistentes de la base de datos.
+   * Obtiene todos las participaciones de la base de datos.
    *
-   * @param {Request} _req - La petici n HTTP.
+   * @param {Request} _req - La peticion HTTP.
    * @param {Response} res - La respuesta HTTP.
    * @returns {Promise<void>} - La promesa que se resuelve cuando se
-   *                            termina de obtener los asistentes.
-   * @throws {Error} - Si ocurre un error al obtener los asistentes.
+   *                            termina de obtener las participaciones.
+   * @throws {Error} - Si ocurre un error al obtenerlas participaciones.
    */
   async getAll(_req: Request, res: Response): Promise<void> {
     try {
-      const asistentes = await this._repoAsistente.obtenerTodos();
-      res.json(asistentes);
+      const participacion = await this._repoParticipacion.obtenerTodos();
+      res.json(participacion);
     } catch (error) {
-      console.error("Error al obtener asistentes:", error);
-      res.status(500).json({ error: "Error al obtener asistentes" });
+      console.error("Error al obtener las participaciones:", error);
+      res.status(500).json({ error: "Error al obtener las participaciones" });
     }
   }
 
   /**
-   * Obtiene un asistente por su id.
+   * Obtiene una participacion por su id.
    *
    * @param {Request} req - La peticion HTTP.
    * @param {Response} res - La respuesta HTTP.
    * @returns {Promise<void>} - La promesa que se resuelve cuando se
-   *                            termina de obtener el asistente.
-   * @throws {Error} - Si ocurre un error al obtener el asistente.
+   *                            termina de obtener las participaciones.
+   * @throws {Error} - Si ocurre un error al obtener las participaciones.
    */
   async getId(req: Request, res: Response): Promise<void> {
     const { id } = req.params;
     try {
-      const asistente = await this._repoAsistente.buscarPorId(Number(id));
-      if (asistente === null) {
-        res
-          .status(404)
-          .json({ error: "No se encuentra el asistente, intente de nuevo" });
+      const participacion = await this._repoParticipacion.buscarPorId(
+        Number(id)
+      );
+      if (participacion === null) {
+        res.status(404).json({
+          error: "No se encuentra la participacion, intente de nuevo",
+        });
         return;
       }
-      res.json(asistente);
+
+      res.json(participacion);
     } catch (error) {
-      console.error(`Error al obtener asistente con id ${id}:`, error);
-      res.status(500).json({ error: "Error al obtener asistente" });
+      console.error(`Error al obtener la participacion con id ${id}:`, error);
+      res.status(500).json({ error: "Error al obtener la participacion" });
     }
   }
 
   /**
-   * Crea un nuevo asistente en la base de datos.
+   * Crea una nueva participacion en la base de datos.
    *
    * @param {Request} _req - La peticion HTTP con el cuerpo que contiene
-   *                         los datos del nuevo asistente.
+   *                         los datos de la nuevo participacion.
    * @param {Response} res - La respuesta HTTP.
    * @returns {Promise<void>} - La promesa que se resuelve cuando se
-   *                            termina de crear el asistente.
-   * @throws {Error} - Si ocurre un error al crear el asistente.
+   *                            termina de crear la participacion.
+   * @throws {Error} - Si ocurre un error al crear la participacion.
    */
   async post(_req: Request, res: Response): Promise<void> {
     try {
-      const asistente: IAsistente = _req.body;
-      const resultado = await this._repoAsistente.crear(asistente);
+      const participacion: IParticipacion = _req.body;
+      const resultado = await this._repoParticipacion.crear(participacion);
       res.json(resultado);
     } catch (error) {
       console.error("Error al crear el asistente:", error);
@@ -96,11 +99,11 @@ class AsistenteController {
    */
   async put(_req: Request, res: Response): Promise<void> {
     const { id } = _req.params;
-    const asistente: IAsistente = _req.body;
+    const participacion: IParticipacion = _req.body;
     try {
-      const resultado = await this._repoAsistente.actualizar(
+      const resultado = await this._repoParticipacion.actualizar(
         Number(id),
-        asistente
+        participacion
       );
       res.json(resultado);
     } catch (error) {
@@ -121,11 +124,11 @@ class AsistenteController {
    */
   async patch(_req: Request, _res: Response): Promise<void> {
     const { id } = _req.params;
-    const asistente: IAsistente = _req.body;
+    const participacion: IParticipacion = _req.body;
     try {
-      const resultado = await this._repoAsistente.actualizar(
+      const resultado = await this._repoParticipacion.actualizar(
         Number(id),
-        asistente
+        participacion
       );
       _res.json(resultado);
     } catch (error) {
@@ -135,4 +138,4 @@ class AsistenteController {
   }
 }
 
-export default AsistenteController;
+export default ParticipacionController;

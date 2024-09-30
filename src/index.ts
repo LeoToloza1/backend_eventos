@@ -48,6 +48,7 @@ class Servidor extends ServidorAbstract {
   private configurarRutas(): void {
     this.app.use("/asistentes", this.asistenteRouter.getRouter());
     this.app.use("/eventos", this.eventosRouter.getRouter());
+    this.app.use("/participacion", this.participacionRouter.getRouter());
   }
 
   /**

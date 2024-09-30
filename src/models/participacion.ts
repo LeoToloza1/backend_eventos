@@ -1,6 +1,7 @@
 /**
  * uso del principio LPS (principio de sustitución de Liskov)
  * para la clase persona
+ * podria hacer lo mismo con la clase Evento, pero de momento es la clase padre.
  */
 
 class Participacion {
