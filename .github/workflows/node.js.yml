@@ -26,10 +26,9 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20.x'
-        cache: 'npm'
 
-    - name: Check npm version
-      run: npm --version
+    # - name: Check npm version
+    #   run: npm --version
       
     - name: instalar pnpm
       run: npm install -g pnpm
@@ -39,10 +38,10 @@ jobs:
 
       
     - name: Install Dependencies
-      run: npm install  # Cambia npm ci por pnpm install
+      run: pnpm install  # Cambia npm ci por pnpm install
     
     - name: Build
-      run: npm run tsc # ejecutar el comando tsc del package.json
+      run: pnpm run tsc # ejecutar el comando tsc del package.json
 
  # Despliegue por FTP
     - name: Deploy a Alwaysdata via FTP
