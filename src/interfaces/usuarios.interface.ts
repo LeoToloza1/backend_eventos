@@ -1,4 +1,4 @@
 interface IUsuario extends IPersona {
-  password: string;
-  id_rol: number;
+  password: string | null;
+  rol_id: number;
 }

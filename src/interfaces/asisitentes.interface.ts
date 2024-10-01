@@ -1,4 +1,1 @@
-interface IAsistente extends IPersona {
-  telefono: number;
-  dni: number;
-}
+interface IAsistente extends IPersona {}

@@ -8,6 +8,10 @@ import RepoEvento from "./repository/evento.repository";
 import RepoParticipacion from "./repository/participacion.repository";
 import ParticipacionController from "./controllers/participacion.controller";
 import ParticipacionRouter from "./routes/participacion.router";
+import UsuarioController from "./controllers/usuario.controller";
+import UsuarioRouter from "./routes/usuarios.router";
+import RepoUsuario from "./repository/usuario.repository";
+
 abstract class ServidorAbstract {
   protected db: Conectar;
   protected repoAsistente: RepoAsistente;
@@ -19,6 +23,9 @@ abstract class ServidorAbstract {
   protected participacionController: ParticipacionController;
   protected participacionRouter: ParticipacionRouter;
   protected repoParticipacion: RepoParticipacion;
+  protected usuarioController: UsuarioController;
+  protected usuarioRouter: UsuarioRouter;
+  protected repoUsuario: RepoUsuario;
 
   /**
    * Constructor de la clase abstracta ServidorAbstract.
@@ -41,6 +48,9 @@ abstract class ServidorAbstract {
     this.participacionRouter = new ParticipacionRouter(
       this.participacionController
     );
+    this.repoUsuario = new RepoUsuario(this.db);
+    this.usuarioController = new UsuarioController(this.repoUsuario);
+    this.usuarioRouter = new UsuarioRouter(this.usuarioController);
   }
 
   abstract iniciarServidor(): void;

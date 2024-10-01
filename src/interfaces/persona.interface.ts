@@ -3,4 +3,6 @@ interface IPersona {
   nombre: string;
   apellido: string;
   email: string;
+  telefono: number;
+  dni: number;
 }

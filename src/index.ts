@@ -49,6 +49,7 @@ class Servidor extends ServidorAbstract {
     this.app.use("/asistentes", this.asistenteRouter.getRouter());
     this.app.use("/eventos", this.eventosRouter.getRouter());
     this.app.use("/participacion", this.participacionRouter.getRouter());
+    this.app.use("/usuarios", this.usuarioRouter.getRouter());
   }
 
   /**
