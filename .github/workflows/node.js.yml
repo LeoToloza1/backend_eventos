@@ -1,0 +1,50 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: backend_eventos
+#cuando se va a ejecutar la action
+on: 
+  push: #cuando hacen push
+    branches: [ "main" ] #en la rtama main
+  pull_request:
+    branches: [ "main" ]
+
+#trabajo
+jobs:
+  build: #este proceso es el de construccion del proyecto
+    runs-on: ubuntu-latest #en que tipo de maquina va a ejecutarse la action
+    
+#la estrategia matrix sirve para ejecutar la aplicacion en diferentes versiones de node
+    #strategy:
+     # matrix:
+      #  node-version: [18.x, 20.x, 22.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+#pasos que va a ejecutar
+    steps:
+    - uses: actions/checkout@v4 #action para chequear el repositorio (mio)
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'pnpm' # Configura la cache para pnpm
+        
+    - name: Install pnpm
+      run: npm install -g pnpm
+      
+    - name: Install Dependencies
+      run: pnpm install # Cambia npm ci por pnpm install
+    
+    - name: Build
+      run: pnpm run tsc # ejecutar el comando tsc del package.json
+
+ # Despliegue por FTP
+    - name: Deploy a Alwaysdata via FTP
+      uses: SamKirkland/FTP-Deploy-Action@4.1.0 #action para FTP
+      with:
+        server: ${{ secrets.FTP_ALWAYSDATA }} # Dirección del servidor FTP
+        username: ${{ secrets.FTP_USERNAME }} # Tu nombre de usuario FTP
+        password: ${{ secrets.FTP_PASSWORD }} # Tu contraseña FTP
+        local-dir: salida #carpeta que genera TS para la salida del del codigo
+        server-dir: /home/leotoloza/www/backend_eventos # Ruta en el servidor donde se va a desplegar la app
+        git-ftp: true # sube solo los archivos que son modificados
+      
