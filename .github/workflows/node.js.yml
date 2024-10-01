@@ -26,22 +26,29 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20.x'
-        cache: 'npm' 
-        
-    - name: Install Dependencies
-      run: npm install # Cambia npm ci por pnpm install
-    
-    - name: Build
-      run: npm run tsc # ejecutar el comando tsc del package.json
+        cache: 'pnpm' 
 
- # Despliegue por FTP
-    - name: Deploy a Alwaysdata via FTP
-      uses: SamKirkland/FTP-Deploy-Action@4.1.0 #action para FTP
-      with:
-        server: ${{ secrets.FTP_ALWAYSDATA }} # Dirección del servidor FTP
-        username: ${{ secrets.FTP_USERNAME }} # Tu nombre de usuario FTP
-        password: ${{ secrets.FTP_PASSWORD }} # Tu contraseña FTP
-        local-dir: salida #carpeta que genera TS para la salida del del codigo
-        server-dir: /home/leotoloza/www/backend_eventos # Ruta en el servidor donde se va a desplegar la app
-        git-ftp: true # sube solo los archivos que son modificados
+    - name: instalar pnpm
+      run: npm install -g pnpm
+
+    - name: check pnpm
+      run: pnpm --version
+
+      
+ #    - name: Install Dependencies
+ #      run: npm install  # Cambia npm ci por pnpm install
+    
+ #    - name: Build
+ #      run: npm run tsc # ejecutar el comando tsc del package.json
+
+ # # Despliegue por FTP
+ #    - name: Deploy a Alwaysdata via FTP
+ #      uses: SamKirkland/FTP-Deploy-Action@4.1.0 #action para FTP
+ #      with:
+ #        server: ${{ secrets.FTP_ALWAYSDATA }} # Dirección del servidor FTP
+ #        username: ${{ secrets.FTP_USERNAME }} # Tu nombre de usuario FTP
+ #        password: ${{ secrets.FTP_PASSWORD }} # Tu contraseña FTP
+ #        local-dir: salida #carpeta que genera TS para la salida del del codigo
+ #        server-dir: /home/leotoloza/www/backend_eventos # Ruta en el servidor donde se va a desplegar la app
+ #        git-ftp: true # sube solo los archivos que son modificados
       
