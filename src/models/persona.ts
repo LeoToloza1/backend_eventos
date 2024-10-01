@@ -1,10 +1,8 @@
 abstract class Persona {
-  constructor() {}
-
   // Getters
   abstract get id(): number;
 
-  public abstract get nombre(): string;
+  abstract get nombre(): string;
 
   abstract get apellido(): string;
   abstract get email(): string;
@@ -12,6 +10,8 @@ abstract class Persona {
   abstract get telefono(): number;
   abstract get dni(): number;
   // Setters
+  abstract set id(value: number);
+
   abstract set nombre(value: string);
 
   abstract set apellido(value: string);

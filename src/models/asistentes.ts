@@ -36,6 +36,10 @@ class Asistente extends Persona {
   get id(): number {
     return this._id;
   }
+  set id(id: number) {
+    this._id = id;
+  }
+
   public get nombre(): string {
     return this._nombre;
   }
