@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "dev": "nodemon --exec tsx ./src/index.ts",
     "tsc": "tsc",
-    "start": "console-ninja node ./salida/index.js"
+    "start": "node ./salida/index.js"
   },
   "keywords": [],
   "author": "",
