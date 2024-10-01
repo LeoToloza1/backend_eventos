@@ -50,7 +50,7 @@ jobs:
         server: ${{ secrets.FTP_ALWAYSDATA }} # Dirección del servidor FTP
         username: ${{ secrets.FTP_USERNAME }} # Tu nombre de usuario FTP
         password: ${{ secrets.FTP_PASSWORD }} # Tu contraseña FTP
-        local-dir: salida #carpeta que genera TS para la salida del del codigo
-        server-dir: /home/leotoloza/www/backend_eventos # Ruta en el servidor donde se va a desplegar la app
-        git-ftp: true # sube solo los archivos que son modificados
+        local-dir: salida/ #carpeta que genera TS para la salida del del codigo
+        server-dir: /home/leotoloza/www/backend_eventos/ # Ruta en el servidor donde se va a desplegar la app
+        # git-ftp: true # sube solo los archivos que son modificados
       
