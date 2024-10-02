@@ -30,14 +30,14 @@ jobs:
     # - name: Check npm version
     #   run: npm --version
       
-    - name: instalar pnpm
-      run: npm install -g pnpm
+    #- name: instalar pnpm
+    #  run: npm install -g pnpm
 
-    - name: check pnpm
-      run: pnpm --version
+    #- name: check pnpm
+    #  run: pnpm --version
 
     - name: Install Dependencies
-      run: pnpm install 
+      run: npm install 
     
     - name: Build
       run: pnpm run tsc # ejecutar el comando tsc del package.json
