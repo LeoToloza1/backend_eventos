@@ -57,5 +57,5 @@ jobs:
           tsconfig.json
           .gitignore
           .git
-         
+           node_modules/**
           
