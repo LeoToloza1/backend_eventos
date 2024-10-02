@@ -1,6 +1,7 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import morgan from "morgan";
 import ServidorAbstract from "./Servidor.Abstract";
+import path from "path";
 import { config } from "dotenv";
 
 config();
@@ -46,6 +47,10 @@ class Servidor extends ServidorAbstract {
    * de asistentes.
    */
   private configurarRutas(): void {
+    this.app.get("/", (_req: Request, res: Response) => {
+      const index = path.resolve(__dirname, "../index.html");
+      res.sendFile(index);
+    });
     this.app.use("/asistentes", this.asistenteRouter.getRouter());
     this.app.use("/eventos", this.eventosRouter.getRouter());
     this.app.use("/participacion", this.participacionRouter.getRouter());
