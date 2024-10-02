@@ -58,4 +58,5 @@ jobs:
           .gitignore
           .git
            node_modules/**
+           src/
           
