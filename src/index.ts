@@ -3,6 +3,7 @@ import morgan from "morgan";
 import ServidorAbstract from "./Servidor.Abstract";
 import path from "path";
 import { config } from "dotenv";
+import cors from "cors";
 
 config();
 
@@ -38,6 +39,7 @@ class Servidor extends ServidorAbstract {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(express.static("public"));
+    this.app.use(cors());
   }
 
   /**
