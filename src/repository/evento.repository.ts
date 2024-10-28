@@ -20,6 +20,13 @@ class RepoEvento implements ICrud<IEventos>, IMapeo<IEventos> {
       throw new Error("Error al obtener todos los eventos");
     }
   }
+  /**
+   * Obtiene todos los eventos que no han sido realizados de la base de datos.
+   *
+   * @returns {Promise<IEventos[]>} - Un array de objetos IEventos con los
+   *                                  resultados de la consulta de eventos no realizados.
+   * @throws {Error} - Si ocurre un error al obtener los eventos no realizados.
+   */
   async obtenerActivos(): Promise<IEventos[]> {
     try {
       const sql =

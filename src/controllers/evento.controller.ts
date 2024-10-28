@@ -6,6 +6,7 @@ class EventoController {
   constructor(repo: RepoEvento) {
     this._repoEvento = repo;
     this.getAll = this.getAll.bind(this);
+    this.getAllActive = this.getAllActive.bind(this);
     this.getId = this.getId.bind(this);
     this.post = this.post.bind(this);
     this.put = this.put.bind(this);
@@ -30,6 +31,16 @@ class EventoController {
       _res.status(500).json({ error: "Error al obtener los eventos" });
     }
   }
+
+  /**
+   * Obtiene todos los eventos activos de la base de datos.
+   *
+   * @param {Request} _req - La peticion HTTP.
+   * @param {Response} _res - La respuesta HTTP.
+   * @returns {Promise<void>} - La promesa que se resuelve cuando se
+   *                            termina de obtener los eventos.
+   * @throws {Error} - Si ocurre un error al obtener los eventos.
+   */
   async getAllActive(_req: Request, _res: Response): Promise<void> {
     try {
       const eventos = await this._repoEvento.obtenerActivos();
