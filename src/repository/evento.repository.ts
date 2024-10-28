@@ -12,7 +12,7 @@ class RepoEvento implements ICrud<IEventos>, IMapeo<IEventos> {
   async obtenerTodos(): Promise<IEventos[]> {
     try {
       const sql =
-        "SELECT id,nombre,ubicacion,DATE_FORMAT(fecha, '%d-%m-%y') AS fecha,descripcion,realizado FROM eventos";
+        "SELECT id,nombre,ubicacion,DATE_FORMAT(fecha, '%d-%m-%y') AS fecha,descripcion,realizado FROM eventos where realizado = 0 ORDER BY fecha";
       const resultados = await this.db.consultar(sql);
       return this.mapearResultados(resultados);
     } catch (error) {
