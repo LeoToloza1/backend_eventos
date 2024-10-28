@@ -12,6 +12,17 @@ class RepoEvento implements ICrud<IEventos>, IMapeo<IEventos> {
   async obtenerTodos(): Promise<IEventos[]> {
     try {
       const sql =
+        "SELECT id,nombre,ubicacion,DATE_FORMAT(fecha, '%d-%m-%y') AS fecha,descripcion,realizado FROM eventos ORDER BY fecha";
+      const resultados = await this.db.consultar(sql);
+      return this.mapearResultados(resultados);
+    } catch (error) {
+      console.error("Error al obtener todos los eventos:", error);
+      throw new Error("Error al obtener todos los eventos");
+    }
+  }
+  async obtenerActivos(): Promise<IEventos[]> {
+    try {
+      const sql =
         "SELECT id,nombre,ubicacion,DATE_FORMAT(fecha, '%d-%m-%y') AS fecha,descripcion,realizado FROM eventos where realizado = 0 ORDER BY fecha";
       const resultados = await this.db.consultar(sql);
       return this.mapearResultados(resultados);

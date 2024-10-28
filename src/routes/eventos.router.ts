@@ -11,6 +11,7 @@ class EventosRouter {
   }
   private configurarRutas(): void {
     this.router.get("/", this.eventoController.getAll);
+    this.router.get("/activos", this.eventoController.getAllActive);
     this.router.get("/:id", this.eventoController.getId);
     this.router.post("/crear", this.eventoController.post);
     this.router.put("/actualizar/:id", this.eventoController.put);

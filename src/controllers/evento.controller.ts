@@ -30,6 +30,15 @@ class EventoController {
       _res.status(500).json({ error: "Error al obtener los eventos" });
     }
   }
+  async getAllActive(_req: Request, _res: Response): Promise<void> {
+    try {
+      const eventos = await this._repoEvento.obtenerActivos();
+      _res.json(eventos);
+    } catch (error) {
+      console.log(error);
+      _res.status(500).json({ error: "Error al obtener los eventos" });
+    }
+  }
 
   /**
    * Obtiene un evento por su id.
