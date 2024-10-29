@@ -77,15 +77,13 @@ class RepoEvento implements ICrud<IEventos>, IMapeo<IEventos> {
   async crear(item: IEventos): Promise<null | IEventos> {
     try {
       const sql =
-        "INSERT INTO eventos (nombre, ubicacion, fecha, descripcion, realizado) VALUES (?, ?, ?, ?, ?)";
-      const { nombre, ubicacion, fecha, descripcion, realizado } = item;
-      await this.db.consultar(sql, [
-        nombre,
-        ubicacion,
-        fecha,
-        descripcion,
-        realizado,
-      ]);
+        "INSERT INTO eventos (nombre, ubicacion, fecha, descripcion) VALUES (?, ?, ?, ?)";
+      const { nombre, ubicacion, fecha, descripcion } = item;
+      console.log(
+        "sql -->",
+        await this.db.consultar(sql, [nombre, ubicacion, fecha, descripcion])
+      );
+      console.log("evento creado -->", item);
       return item;
     } catch (error) {
       console.error("Error al crear el evento:", error);
