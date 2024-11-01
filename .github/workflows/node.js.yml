@@ -54,7 +54,6 @@ jobs:
           server-dir: www/backend_eventos/ # Ruta en el servidor donde se va a desplegar la app
           # git-ftp: true # sube solo los archivos que son modificados
           exclude: |
-            src/
             tsconfig.json
             .gitignore
             .git
