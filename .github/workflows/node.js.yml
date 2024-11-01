@@ -41,7 +41,8 @@ jobs:
 
       - name: Build
         run: npm run tsc # ejecutar el comando tsc del package.json
-
+      - name: Check compiled files
+        run: ls -l salida/
       # Despliegue por FTP
       - name: Deploy a Alwaysdata via FTP
         uses: SamKirkland/FTP-Deploy-Action@4.1.0 #action para FTP
@@ -49,11 +50,10 @@ jobs:
           server: ${{ secrets.FTP_ALWAYSDATA }} # Dirección del servidor FTP
           username: ${{ secrets.FTP_USERNAME }} # Tu nombre de usuario FTP
           password: ${{ secrets.FTP_PASSWORD }} # Tu contraseña FTP
-          local-dir: ./ # Indica que quieres subir todo desde la raíz del proyecto
+          local-dir: ./salida/ # Indica que quieres subir todo desde la raíz del proyecto
           server-dir: www/backend_eventos/ # Ruta en el servidor donde se va a desplegar la app
           # git-ftp: true # sube solo los archivos que son modificados
           exclude: |
-            src/
             tsconfig.json
             .gitignore
             .git
