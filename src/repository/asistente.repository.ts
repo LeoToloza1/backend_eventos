@@ -147,6 +147,33 @@ async obtenerPorEmail(email:string):Promise<IAsistente | null>{
 }
 
   /**
+   * Actualiza la contraseña de un asistente existente en la base de datos.
+   *
+   * @param {number} id - El id del asistente a actualizar.
+   * @param {string} nuevaContraseña - La nueva contraseña a establecer.
+   * @returns {Promise<boolean>} - true si se actualiza la contraseña
+   *                              correctamente, false si ocurre un error.
+   * @throws {Error} - Si ocurre un error al actualizar la contraseña del
+   *                  asistente con el id especificado.
+   */
+async actualizarContraseña(
+  id: number,
+  nuevaContraseña: string
+): Promise<boolean> {
+  try {
+    const hash = await HasheoService.hashPassword(nuevaContraseña);
+    const sql = `UPDATE asistentes SET password = ? WHERE id = ?`;
+    await this.db.consultar(sql, [hash, id]);
+    return true;
+  } catch (error) {
+    console.error(`Error al actualizar la contraseña del asistente con id ${id}:`, error);
+    return false;
+  }
+}
+
+
+
+  /**
    * Mapea los resultados de una consulta a una lista de objetos Asistente.
    *
    * @param {any[]} resultados - Los resultados de la consulta.

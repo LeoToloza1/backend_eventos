@@ -1,4 +1,6 @@
 import Conectar from "../db/config_db";
+import HasheoService from "../services/hash.service";
+import ValidadorService from "../services/validaciones.service";
 
 class RepoUsuario implements ICrud<IUsuario>, IMapeo<IUsuario> {
   constructor(private readonly db: Conectar) {}
@@ -77,29 +79,36 @@ class RepoUsuario implements ICrud<IUsuario>, IMapeo<IUsuario> {
    * Crea un nuevo usuario en la base de datos.
    *
    * @param {IUsuario} item - El objeto IUsuario con los datos del nuevo
-   *                           usuario.
+   *                          usuario.
    * @returns {Promise<IUsuario | null>} - El objeto IUsuario creado o null si
    *                                       ocurre un error.
    * @throws {Error} - Si ocurre un error al crear el usuario.
    */
   async crear(item: IUsuario): Promise<IUsuario | null> {
     try {
+      const resultado = ValidadorService.validarUsuario(item);
+      if (!resultado.success) {
+        console.error("Error de validación:", resultado.error.errors);
+        return null;
+      }
+      const passwordHasheada = await HasheoService.hashPassword(item.password);
       const sql =
-        "INSERT INTO usuarios (nombre, apellido, email, password,rol_id, telefono, dni) VALUES (?, ?, ?, ?, ?,?,?)";
-      const { nombre, apellido, email, telefono, dni, password, rol_id } = item;
+        "INSERT INTO usuarios (nombre, apellido, email, password, rol_id, telefono, dni) VALUES (?, ?, ?, ?, 1, ?, ?)";
+      const { nombre, apellido, email, telefono, dni } = item;
       await this.db.consultar(sql, [
         nombre,
         apellido,
         email,
-        password,
-        rol_id,
+        passwordHasheada,
         telefono,
         dni,
       ]);
-      return item; //devuelve el  creado
+
+      const usuarioCreado: IUsuario = { ...item, password: "*******" };
+      return usuarioCreado; // Devuelve el usuario creado
     } catch (error) {
       console.error("Error al crear el usuario:", error);
-      return null;
+      return null; // Retorna null en caso de error
     }
   }
   /**
@@ -165,6 +174,33 @@ class RepoUsuario implements ICrud<IUsuario>, IMapeo<IUsuario> {
     } catch (error) {
       console.error(`Error al buscar el usuario con email ${email}:`, error);
       throw new Error(`Error al buscar el usuario con email ${email}`);
+    }
+  }
+  /**
+   * Actualiza la contraseña de un asistente existente en la base de datos.
+   *
+   * @param {number} id - El id del asistente a actualizar.
+   * @param {string} nuevaContraseña - La nueva contraseña a establecer.
+   * @returns {Promise<boolean>} - true si se actualiza la contraseña
+   *                              correctamente, false si ocurre un error.
+   * @throws {Error} - Si ocurre un error al actualizar la contraseña del
+   *                  asistente con el id especificado.
+   */
+  async actualizarContraseña(
+    id: number,
+    nuevaContraseña: string
+  ): Promise<boolean> {
+    try {
+      const hash = await HasheoService.hashPassword(nuevaContraseña);
+      const sql = `UPDATE asistentes SET password = ? WHERE id = ?`;
+      await this.db.consultar(sql, [hash, id]);
+      return true;
+    } catch (error) {
+      console.error(
+        `Error al actualizar la contraseña del asistente con id ${id}:`,
+        error
+      );
+      return false;
     }
   }
 }

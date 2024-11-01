@@ -11,7 +11,6 @@ export default class LoginAsistenteRouter {
     this.configurarRutas();
   }
   private configurarRutas(): void {
-    console.log("llega al router de login asistente");
     this.router.post("/", this._loginAsistente.loginAsistente);
   }
   getRouter(): Router {
