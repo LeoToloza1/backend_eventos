@@ -35,7 +35,9 @@ jobs:
 
       #- name: check pnpm
       #  run: pnpm --version
-      
+      - name: Instalar dependencias⌛
+        run: npm install
+        
       - name: Transpilando TS ⚙
         run: npm run tsc # ejecutar el comando tsc del package.json
       
