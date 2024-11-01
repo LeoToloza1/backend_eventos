@@ -26,6 +26,7 @@ class AsistenteRouter {
     this.router.post("/crear", this.asistenteController.post); //✅
     this.router.put("/actualizar/:id", this.asistenteController.put); //✅
     this.router.patch("/parcial/:id", this.asistenteController.patch); //✅
+    this.router.patch("/cambiarPass", this.asistenteController.cambiarPass); //✅
   }
 
   /**

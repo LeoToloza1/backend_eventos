@@ -3,6 +3,7 @@ class Asistente extends Persona {
   private _nombre: string;
   private _apellido: string;
   private _email: string;
+  private _password: string;
   private _telefono: number;
   private _dni: number;
 
@@ -13,6 +14,7 @@ class Asistente extends Persona {
    * @param {string} nombre - El nombre del asistente.
    * @param {string} apellido - El apellido del asistente.
    * @param {string} email - El email del asistente.
+   * @param {string} password - El password del asistente.
    * @param {number} telefono - El telefono del asistente.
    * @param {number} dni - El dni del asistente.
    */
@@ -21,6 +23,7 @@ class Asistente extends Persona {
     nombre: string,
     apellido: string,
     email: string,
+    password: string,
     telefono: number,
     dni: number
   ) {
@@ -29,6 +32,7 @@ class Asistente extends Persona {
     this._nombre = nombre;
     this._apellido = apellido;
     this._email = email;
+    this._password = password;
     this._telefono = telefono;
     this._dni = dni;
   }
@@ -57,6 +61,12 @@ class Asistente extends Persona {
   }
   set email(value: string) {
     this._email = value;
+  }
+  get password(): string {
+    return this._password;
+  }
+  set password(value: string) {
+    this._password = value;
   }
   get telefono(): number {
     return this._telefono;

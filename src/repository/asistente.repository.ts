@@ -1,4 +1,6 @@
 import Conectar from "../db/config_db";
+import ValidadorService from "../services/validaciones.service";
+import HasheoService from "../services/hash.service";
 class RepoAsistente implements ICrud<IAsistente>, IMapeo<IAsistente> {
   constructor(private readonly db: Conectar) {}
 
@@ -50,18 +52,35 @@ class RepoAsistente implements ICrud<IAsistente>, IMapeo<IAsistente> {
   /**
    * Crea un nuevo asistente en la base de datos.
    *
-   * @param {Asistente} item - El objeto Asistente con los datos del nuevo
-   *                           asistente.
-   * @returns {Promise<IAsistente>} - El objeto Asistente creado.
+   * @param {IAsistente} item - El objeto IAsistente con los datos del nuevo
+   *                            asistente.
+   * @returns {Promise<IAsistente | null>} - Un objeto IAsistente con los datos
+   *                                       del asistente creado o null si
+   *                                       ocurre un error.
    * @throws {Error} - Si ocurre un error al crear el asistente.
    */
   async crear(item: IAsistente): Promise<IAsistente | null> {
     try {
+      const resultado = ValidadorService.validarAsistente(item);
+      if (!resultado.success) {
+        console.error("Error de validación:", resultado.error.errors);
+        return null;
+      }
+      item.password = await HasheoService.hashPassword(item.password);
       const sql =
-        "INSERT INTO asistentes (nombre, apellido, email, telefono, dni) VALUES (?, ?, ?, ?, ?)";
+        "INSERT INTO asistentes (nombre, apellido, email, password, telefono, dni) VALUES (?, ?, ?, ?, ?, ?)";
       const { nombre, apellido, email, telefono, dni } = item;
-      await this.db.consultar(sql, [nombre, apellido, email, telefono, dni]);
-      return item; //devuelve el asistente creado
+
+      await this.db.consultar(sql, [
+        nombre,
+        apellido,
+        email,
+        item.password,
+        telefono,
+        dni,
+      ]);
+      item.password = "********"; // Ocultar la contraseña
+      return item;
     } catch (error) {
       console.error("Error al crear el asistente:", error);
       return null;
@@ -83,20 +102,17 @@ class RepoAsistente implements ICrud<IAsistente>, IMapeo<IAsistente> {
     item: Partial<IAsistente>
   ): Promise<IAsistente | boolean> {
     try {
-      /**
-       * obtener los campos de la consulta a ejecutar de manera dinamica
-       * segun las propiedades que envie el objeto
-       */
+
       const campos = Object.keys(item)
         .filter((key) => item[key as keyof IAsistente] !== undefined)
         .map((key) => `${key} = ?`);
       const valores = Object.values(item).filter(
         (valor) => valor !== undefined
       );
-
       if (campos.length === 0) {
         throw new Error("No hay campos para actualizar");
       }
+
       const sql = `UPDATE asistentes SET ${campos.join(", ")} WHERE id = ?`;
       await this.db.consultar(sql, [...valores, id]);
       return true;
@@ -105,6 +121,30 @@ class RepoAsistente implements ICrud<IAsistente>, IMapeo<IAsistente> {
       return false;
     }
   }
+
+  /**
+   * Busca un asistente por su email.
+   *
+   * @param {string} email - El email del asistente a buscar.
+   * @returns {Promise<IAsistente | null>} - Un objeto Asistente con los
+   *                                       resultados de la consulta o null
+   *                                       si no se encuentra un asistente
+   *                                       con el email especificado.
+   * @throws {Error} - Si ocurre un error al buscar el asistente con el email
+   *                  especificado.
+   */
+async obtenerPorEmail(email:string):Promise<IAsistente | null>{
+  try{
+    const resultados = await this.db.consultar('SELECT * FROM asistentes WHERE email = ?', [email]);
+    if(resultados.length === 0){
+      return null;
+    }
+    return this.mapearResultados(resultados)[0];
+  }catch(error){
+    console.error(`Error al buscar el asistente con email ${email}:`, error);
+    throw new Error(`Error al buscar el asistente con email ${email}`);
+  }
+}
 
   /**
    * Mapea los resultados de una consulta a una lista de objetos Asistente.
@@ -120,6 +160,7 @@ class RepoAsistente implements ICrud<IAsistente>, IMapeo<IAsistente> {
       nombre: resultado.nombre,
       apellido: resultado.apellido,
       email: resultado.email,
+      password: resultado.password,
       telefono: resultado.telefono,
       dni: resultado.dni,
     }));

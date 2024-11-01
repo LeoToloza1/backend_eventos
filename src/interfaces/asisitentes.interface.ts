@@ -1,1 +1,3 @@
-interface IAsistente extends IPersona {}
+interface IAsistente extends IPersona {
+  password: string;
+}

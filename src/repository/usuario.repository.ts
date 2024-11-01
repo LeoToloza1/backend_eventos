@@ -19,7 +19,7 @@ class RepoUsuario implements ICrud<IUsuario>, IMapeo<IUsuario> {
       email: resultado.email,
       telefono: resultado.telefono,
       dni: resultado.dni,
-      password: null,
+      password: "********",
       rol_id: resultado.rol_id,
       rol: {
         rol: resultado.rol_nombre,
@@ -138,6 +138,33 @@ class RepoUsuario implements ICrud<IUsuario>, IMapeo<IUsuario> {
     } catch (error) {
       console.error(`Error al actualizar el usuario con id ${id}:`, error);
       return false;
+    }
+  }
+
+  /**
+   * Busca un usuario por su email.
+   *
+   * @param {string} email - El email del usuario a buscar.
+   * @returns {Promise<IAsistente | null>} - Un objeto Asistente con los
+   *                                       resultados de la consulta o null
+   *                                       si no se encuentra un usuario
+   *                                       con el email especificado.
+   * @throws {Error} - Si ocurre un error al buscar el usuario con el email
+   *                  especificado.
+   */
+  async obtenerPorEmail(email: string): Promise<IAsistente | null> {
+    try {
+      const resultados = await this.db.consultar(
+        "SELECT * FROM usuarios WHERE email = ?",
+        [email]
+      );
+      if (resultados.length === 0) {
+        return null;
+      }
+      return this.mapearResultados(resultados)[0];
+    } catch (error) {
+      console.error(`Error al buscar el usuario con email ${email}:`, error);
+      throw new Error(`Error al buscar el usuario con email ${email}`);
     }
   }
 }
