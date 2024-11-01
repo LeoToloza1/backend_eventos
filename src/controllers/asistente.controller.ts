@@ -54,8 +54,8 @@ class AsistenteController {
    * @throws {Error} - Si ocurre un error al obtener el asistente.
    */
   async getId(req: Request, res: Response): Promise<void> {
-    const { id } = req.params;
-    console.log("Payload JWT:", req.user);
+ const id = req.user?.userId;
+ 
     try {
       const asistente = await this._repoAsistente.buscarPorId(Number(id));
       if (asistente === null) {

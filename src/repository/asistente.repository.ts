@@ -189,7 +189,7 @@ class RepoAsistente implements ICrud<IAsistente>, IMapeo<IAsistente> {
       nombre: resultado.nombre,
       apellido: resultado.apellido,
       email: resultado.email,
-      password: resultado.password,
+      password: "***********",
       telefono: resultado.telefono,
       dni: resultado.dni,
     }));
