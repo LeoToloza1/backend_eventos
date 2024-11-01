@@ -35,16 +35,25 @@ jobs:
 
       #- name: check pnpm
       #  run: pnpm --version
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Build
+      
+      - name: Transpilando TS ⚙
         run: npm run tsc # ejecutar el comando tsc del package.json
-      - name: Check compiled files
+      
+      - name: Copiar archivos necesarios a la carpeta salida ⌛
+        run: |
+          cp package.json salida/
+          cp package-lock.json salida/
+          cp index.html salida/
+      
+      - name: Instalar dependencias en la carpeta de salida ⌛
+        working-directory: ./salida
+        run: npm install
+     
+      - name: chekear carpetas creadas ⌛
         run: ls -l salida/
       # Despliegue por FTP
-      - name: Deploy a Alwaysdata via FTP
+      
+      - name: Deploy a Alwaysdata via FTP 📂
         uses: SamKirkland/FTP-Deploy-Action@4.1.0 #action para FTP
         with:
           server: ${{ secrets.FTP_ALWAYSDATA }} # Dirección del servidor FTP
@@ -54,6 +63,7 @@ jobs:
           server-dir: www/backend_eventos/ # Ruta en el servidor donde se va a desplegar la app
           # git-ftp: true # sube solo los archivos que son modificados
           exclude: |
+            src/
             tsconfig.json
             .gitignore
             .git
