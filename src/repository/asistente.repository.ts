@@ -102,7 +102,6 @@ class RepoAsistente implements ICrud<IAsistente>, IMapeo<IAsistente> {
     item: Partial<IAsistente>
   ): Promise<IAsistente | boolean> {
     try {
-
       const campos = Object.keys(item)
         .filter((key) => item[key as keyof IAsistente] !== undefined)
         .map((key) => `${key} = ?`);
@@ -133,18 +132,21 @@ class RepoAsistente implements ICrud<IAsistente>, IMapeo<IAsistente> {
    * @throws {Error} - Si ocurre un error al buscar el asistente con el email
    *                  especificado.
    */
-async obtenerPorEmail(email:string):Promise<IAsistente | null>{
-  try{
-    const resultados = await this.db.consultar('SELECT * FROM asistentes WHERE email = ?', [email]);
-    if(resultados.length === 0){
-      return null;
+  async obtenerPorEmail(email: string): Promise<IAsistente | null> {
+    try {
+      const resultados = await this.db.consultar(
+        "SELECT * FROM asistentes WHERE email = ?",
+        [email]
+      );
+      if (resultados.length === 0) {
+        return null;
+      }
+      return this.mapearResultados(resultados)[0];
+    } catch (error) {
+      console.error(`Error al buscar el asistente con email ${email}:`, error);
+      throw new Error(`Error al buscar el asistente con email ${email}`);
     }
-    return this.mapearResultados(resultados)[0];
-  }catch(error){
-    console.error(`Error al buscar el asistente con email ${email}:`, error);
-    throw new Error(`Error al buscar el asistente con email ${email}`);
   }
-}
 
   /**
    * Actualiza la contraseña de un asistente existente en la base de datos.
@@ -156,22 +158,22 @@ async obtenerPorEmail(email:string):Promise<IAsistente | null>{
    * @throws {Error} - Si ocurre un error al actualizar la contraseña del
    *                  asistente con el id especificado.
    */
-async actualizarContraseña(
-  id: number,
-  nuevaContraseña: string
-): Promise<boolean> {
-  try {
-    const hash = await HasheoService.hashPassword(nuevaContraseña);
-    const sql = `UPDATE asistentes SET password = ? WHERE id = ?`;
-    await this.db.consultar(sql, [hash, id]);
-    return true;
-  } catch (error) {
-    console.error(`Error al actualizar la contraseña del asistente con id ${id}:`, error);
-    return false;
+  async actualizarContraseña(
+    id: number,
+    nuevaContraseña: string
+  ): Promise<boolean> {
+    try {
+      const sql = `UPDATE asistentes SET password = ? WHERE id = ?`;
+      await this.db.consultar(sql, [nuevaContraseña, id]);
+      return true;
+    } catch (error) {
+      console.error(
+        `Error al actualizar la contraseña del asistente con id ${id}:`,
+        error
+      );
+      return false;
+    }
   }
-}
-
-
 
   /**
    * Mapea los resultados de una consulta a una lista de objetos Asistente.

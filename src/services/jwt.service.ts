@@ -27,6 +27,7 @@ export class JwtService {
    */
   public verificarToken(token: string): JwtPayload {
     try {
+      console.log("Llega a verificar token");
       return jwt.verify(token, this.secret) as JwtPayload;
     } catch (error) {
       throw new Error("Token inválido o expirado");

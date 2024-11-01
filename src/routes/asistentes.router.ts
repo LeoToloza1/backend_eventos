@@ -1,9 +1,11 @@
 import { Router } from "express";
 import AsistenteController from "../controllers/asistente.controller";
+import Auth from "../middleware/auth";
 
 class AsistenteRouter {
   private router = Router();
   private readonly asistenteController: AsistenteController;
+  private _auth = new Auth();
   constructor(_asistenteControler: AsistenteController) {
     this.asistenteController = _asistenteControler;
     this.configurarRutas();
@@ -22,11 +24,21 @@ class AsistenteRouter {
    */
   private configurarRutas(): void {
     this.router.get("/", this.asistenteController.getAll); //✅
-    this.router.get("/:id", this.asistenteController.getId); //✅
+    this.router.get(
+      "/:id",
+      this._auth.autenticado,
+      this.asistenteController.getId
+    ); //✅
     this.router.post("/crear", this.asistenteController.post); //✅
     this.router.put("/actualizar/:id", this.asistenteController.put); //✅
     this.router.patch("/parcial/:id", this.asistenteController.patch); //✅
     this.router.patch("/cambiarPass", this.asistenteController.cambiarPass); //✅
+    this.router.patch("/password", this.asistenteController.cambiarContraseña); //✅
+    this.router.get(
+      "/perfil",
+      this._auth.autenticado,
+      this.asistenteController.getId
+    ); //✅
   }
 
   /**

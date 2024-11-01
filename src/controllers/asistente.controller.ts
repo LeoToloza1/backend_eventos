@@ -22,12 +22,13 @@ class AsistenteController {
     this.put = this.put.bind(this);
     this.patch = this.patch.bind(this);
     this.cambiarPass = this.cambiarPass.bind(this);
+    this.cambiarContraseña = this.cambiarContraseña.bind(this);
   }
 
   /**
    * Obtiene todos los asistentes de la base de datos.
    *
-   * @param {Request} _req - La petici n HTTP.
+   * @param {Request} _req - La peticion HTTP.
    * @param {Response} res - La respuesta HTTP.
    * @returns {Promise<void>} - La promesa que se resuelve cuando se
    *                            termina de obtener los asistentes.
@@ -54,6 +55,7 @@ class AsistenteController {
    */
   async getId(req: Request, res: Response): Promise<void> {
     const { id } = req.params;
+    console.log("Payload JWT:", req.user);
     try {
       const asistente = await this._repoAsistente.buscarPorId(Number(id));
       if (asistente === null) {
@@ -201,7 +203,7 @@ class AsistenteController {
    * @throws {Error} - Si ocurre un error al cambiar la contraseña.
    */
   async cambiarContraseña(req: Request, res: Response): Promise<void> {
-    const { email, passwordNueva } = req.body; // Obtener la nueva contraseña del cuerpo de la solicitud
+    const { email, passwordNueva } = req.body;
     try {
       const asistente = await this._repoAsistente.obtenerPorEmail(email);
 

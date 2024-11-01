@@ -1,4 +1,3 @@
-// middleware/auth.ts
 import { Request, Response, NextFunction } from "express";
 import { JwtService } from "../services/jwt.service";
 
@@ -9,6 +8,8 @@ export default class Auth {
     this.jwtService = new JwtService(
       process.env.JWT_SECRET || "mi_secreto_de_ejemplo"
     );
+    this.autenticado = this.autenticado.bind(this);
+    this.verificarRol = this.verificarRol.bind(this);
   }
 
   public async autenticado(
@@ -29,18 +30,16 @@ export default class Auth {
     }
     try {
       const decoded = this.jwtService.verificarToken(token); // Esto es JwtPayload
-
       req.user = {
         userId: decoded.userId,
         userEmail: decoded.userEmail,
         userName: decoded.userName,
         role: decoded.role,
       };
-
       next();
     } catch (error) {
       console.error("Error al verificar el token:", error);
-      res.status(403).json({ message: "Token no válido." }); // Asegúrate de retornar aquí
+      res.status(403).json({ message: "Token no válido." });
       return;
     }
   }

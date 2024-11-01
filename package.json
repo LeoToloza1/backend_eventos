@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "nodemon --exec tsx ./src/index.ts",
     "tsc": "tsc",
-    "start": "node ./salida/index.js"
+    "start": "node ./index.js",
+    "local": "node ./salida/index.js"
   },
   "keywords": [],
   "author": "",
