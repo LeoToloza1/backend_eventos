@@ -21,7 +21,7 @@ class RepoUsuario implements ICrud<IUsuario>, IMapeo<IUsuario> {
       email: resultado.email,
       telefono: resultado.telefono,
       dni: resultado.dni,
-      password: "********",
+      password: resultado.password,
       rol_id: resultado.rol_id,
       rol: {
         rol: resultado.rol_nombre,
@@ -177,23 +177,22 @@ class RepoUsuario implements ICrud<IUsuario>, IMapeo<IUsuario> {
     }
   }
   /**
-   * Actualiza la contraseña de un asistente existente en la base de datos.
+   * Actualiza la contraseña de un usuario existente en la base de datos.
    *
-   * @param {number} id - El id del asistente a actualizar.
+   * @param {number} id - El id del usuario a actualizar.
    * @param {string} nuevaContraseña - La nueva contraseña a establecer.
    * @returns {Promise<boolean>} - true si se actualiza la contraseña
    *                              correctamente, false si ocurre un error.
    * @throws {Error} - Si ocurre un error al actualizar la contraseña del
-   *                  asistente con el id especificado.
+   *                  usuario con el id especificado.
    */
   async actualizarContraseña(
     id: number,
     nuevaContraseña: string
   ): Promise<boolean> {
     try {
-      const hash = await HasheoService.hashPassword(nuevaContraseña);
-      const sql = `UPDATE asistentes SET password = ? WHERE id = ?`;
-      await this.db.consultar(sql, [hash, id]);
+      const sql = `UPDATE usuarios SET password = ? WHERE id = ?`;
+      await this.db.consultar(sql, [nuevaContraseña, id]);
       return true;
     } catch (error) {
       console.error(

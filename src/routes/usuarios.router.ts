@@ -22,10 +22,12 @@ class UsuarioRouter {
    */
   private configurarRutas(): void {
     this.router.get("/", this.usuarioController.getAll); //✅
+    this.router.post("/login", this.usuarioController.loginUsuario);
     this.router.get("/:id", this.usuarioController.getId); //✅
     this.router.post("/crear", this.usuarioController.post); //✅
     this.router.put("/actualizar/:id", this.usuarioController.put); //✅
     this.router.patch("/parcial/:id", this.usuarioController.patch); //✅
+    this.router.patch("/recuperar_pass", this.usuarioController.recueprarPass);
   }
 
   /**

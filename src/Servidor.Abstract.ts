@@ -12,8 +12,6 @@ import UsuarioController from "./controllers/usuario.controller";
 import UsuarioRouter from "./routes/usuarios.router";
 import RepoUsuario from "./repository/usuario.repository";
 import { EmailService } from "./services/mailer.service";
-import LoginAsistenteController from "./controllers/loginAsistente.controller";
-import LoginAsistenteRouter from "./routes/loginAsistente.router";
 
 abstract class ServidorAbstract {
   protected db: Conectar;
@@ -30,8 +28,6 @@ abstract class ServidorAbstract {
   protected usuarioRouter: UsuarioRouter;
   protected repoUsuario: RepoUsuario;
   protected _emailService: EmailService;
-  protected _loginAsistente: LoginAsistenteController;
-  protected _loginAsistenteRouter: LoginAsistenteRouter;
 
   /**
    * Constructor de la clase abstracta ServidorAbstract.
@@ -42,15 +38,18 @@ abstract class ServidorAbstract {
   constructor() {
     this._emailService = new EmailService();
     this.db = Conectar.obtenerInstancia();
+
     this.repoAsistente = new RepoAsistente(this.db);
     this.asistenteController = new AsistenteController(
       this.repoAsistente,
       this._emailService
     );
     this.asistenteRouter = new AsistenteRouter(this.asistenteController);
+
     this.repoEvento = new RepoEvento(this.db);
     this.eventoController = new EventoController(this.repoEvento);
     this.eventosRouter = new EventosRouter(this.eventoController);
+
     this.repoParticipacion = new RepoParticipacion(this.db);
     this.participacionController = new ParticipacionController(
       this.repoParticipacion
@@ -58,11 +57,10 @@ abstract class ServidorAbstract {
     this.participacionRouter = new ParticipacionRouter(
       this.participacionController
     );
+
     this.repoUsuario = new RepoUsuario(this.db);
     this.usuarioController = new UsuarioController(this.repoUsuario);
     this.usuarioRouter = new UsuarioRouter(this.usuarioController);
-    this._loginAsistente = new LoginAsistenteController(this.repoAsistente);
-    this._loginAsistenteRouter = new LoginAsistenteRouter(this._loginAsistente);
   }
 
   abstract iniciarServidor(): void;

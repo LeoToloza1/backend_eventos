@@ -3,10 +3,12 @@ import RepoAsistente from "../repository/asistente.repository";
 import { EmailService } from "../services/mailer.service";
 import HasheoService from "../services/hash.service";
 import { GeneradorAleatorio } from "../services/generadorAleatorio.service";
+import { JwtService } from "../services/jwt.service";
 
 class AsistenteController {
   private readonly _repoAsistente: RepoAsistente;
   private readonly emailService: EmailService;
+  private readonly jwt: JwtService;
 
   /**
    * Constructor de la clase AsistenteController.
@@ -16,13 +18,71 @@ class AsistenteController {
   constructor(repoAsistente: RepoAsistente, emailService: EmailService) {
     this._repoAsistente = repoAsistente;
     this.emailService = emailService;
+    this.jwt = new JwtService(
+      process.env.JWT_SECRET || "mi_secreto_de_ejemplo"
+    );
     this.getAll = this.getAll.bind(this);
     this.getId = this.getId.bind(this);
     this.post = this.post.bind(this);
     this.put = this.put.bind(this);
     this.patch = this.patch.bind(this);
-    this.cambiarPass = this.cambiarPass.bind(this);
+    this.recuperarPass = this.recuperarPass.bind(this);
     this.cambiarContraseña = this.cambiarContraseña.bind(this);
+    this.loginAsistente = this.loginAsistente.bind(this);
+  }
+
+  /**
+   * Realiza el inicio de sesión de un asistente.
+   *
+   * @param {Request} req - La petición HTTP con el cuerpo que contiene el email y la contraseña del asistente.
+   * @param {Response} res - La respuesta HTTP con el token de inicio de sesión.
+   * @returns {Promise<void>} - La promesa que se resuelve cuando se termina de procesar el inicio de sesión.
+   * @throws {Error} - Si ocurre un error al procesar el inicio de sesión.
+   */
+  async loginAsistente(req: Request, res: Response): Promise<void> {
+    const { email, password } = req.body;
+
+    console.log("USUARIO INTENTANDO INGRESAR: -->", email, password);
+    if (!email || !password) {
+      res
+        .status(400)
+        .json({ message: "El email y la contraseña son requeridos." });
+      return;
+    }
+
+    try {
+      const asistente = await this._repoAsistente.obtenerPorEmail(email);
+      console.log("Asistente encontrado:", asistente?.nombre);
+      if (!asistente) {
+        res.status(404).json({ message: "Usuario no encontrado." });
+        return;
+      }
+      const passwordEsValido = await HasheoService.comparePassword(
+        password,
+        asistente.password
+      );
+      console.log("CONTRASEÑA:", asistente.password);
+
+      if (!passwordEsValido) {
+        res.status(401).json({ message: "Credenciales inválidas." });
+        return;
+      }
+      //se está creando un payload para el token, que incluye el userId, userEmail, userName, y el role del usuario. Esto es importante porque, al decodificar el token más tarde, se puede extraer esta información.
+      const token = this.jwt.generarToken({
+        userId: asistente.id,
+        userEmail: asistente.email,
+        userName: asistente.nombre,
+        role: "asistente",
+      });
+
+      res.status(200).json({
+        message: "Inicio de sesión exitoso.",
+        token,
+      });
+    } catch (error) {
+      console.error("Error al procesar el inicio de sesión:", error);
+      res.status(500).json({ message: "Error al procesar la solicitud." });
+    }
   }
 
   /**
@@ -54,8 +114,8 @@ class AsistenteController {
    * @throws {Error} - Si ocurre un error al obtener el asistente.
    */
   async getId(req: Request, res: Response): Promise<void> {
- const id = req.user?.userId;
- 
+    const id = req.user?.userId;
+
     try {
       const asistente = await this._repoAsistente.buscarPorId(Number(id));
       if (asistente === null) {
@@ -156,7 +216,7 @@ class AsistenteController {
    *                  enviar el correo.
    */
 
-  async cambiarPass(req: Request, res: Response): Promise<void> {
+  async recuperarPass(req: Request, res: Response): Promise<void> {
     const { email } = req.body;
     try {
       const asistente = await this._repoAsistente.obtenerPorEmail(email);

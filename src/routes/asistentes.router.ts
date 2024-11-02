@@ -5,6 +5,7 @@ import Auth from "../middleware/auth";
 class AsistenteRouter {
   private router = Router();
   private readonly asistenteController: AsistenteController;
+
   private _auth = new Auth();
   constructor(_asistenteControler: AsistenteController) {
     this.asistenteController = _asistenteControler;
@@ -23,17 +24,37 @@ class AsistenteRouter {
    * - PATCH /parcial/:id : Actualiza parcialmente un asistente existente en la base de datos.
    */
   private configurarRutas(): void {
-    this.router.get("/", this.asistenteController.getAll); //✅
+    this.router.get(
+      "/",
+      this._auth.verificarRol(["usuario"]),
+      this.asistenteController.getAll
+    ); //✅
+    this.router.post("/login", this.asistenteController.loginAsistente);
     this.router.get(
       "/:id",
       this._auth.autenticado,
       this.asistenteController.getId
     ); //✅
     this.router.post("/crear", this.asistenteController.post); //✅
-    this.router.put("/actualizar/:id", this.asistenteController.put); //✅
-    this.router.patch("/parcial/:id", this.asistenteController.patch); //✅
-    this.router.patch("/cambiarPass", this.asistenteController.cambiarPass); //✅
-    this.router.patch("/password", this.asistenteController.cambiarContraseña); //✅
+    this.router.put(
+      "/actualizar/:id",
+      this._auth.autenticado,
+      this.asistenteController.put
+    ); //✅
+    this.router.patch(
+      "/parcial/:id",
+      this._auth.autenticado,
+      this.asistenteController.patch
+    ); //✅
+    this.router.patch(
+      "/recuperar_password",
+      this.asistenteController.recuperarPass
+    ); //✅ recupero de contraseña por email
+    this.router.patch(
+      "/password",
+      this._auth.autenticado,
+      this.asistenteController.cambiarContraseña
+    ); //✅ cambiar contraseña
     this.router.get(
       "/perfil",
       this._auth.autenticado,

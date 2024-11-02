@@ -1,8 +1,14 @@
 import { Request, Response } from "express";
 import RepoUsuario from "../repository/usuario.repository";
+import HasheoService from "../services/hash.service";
+import { GeneradorAleatorio } from "../services/generadorAleatorio.service";
+import { EmailService } from "../services/mailer.service";
+import { JwtService } from "../services/jwt.service";
 
 class UsuarioController {
   private readonly _repoUsuario: RepoUsuario;
+  private readonly emailService = new EmailService();
+  private readonly jwt: JwtService;
 
   /**
    * Constructor de la clase UsuarioController.
@@ -11,11 +17,64 @@ class UsuarioController {
    */
   constructor(repoUsuario: RepoUsuario) {
     this._repoUsuario = repoUsuario;
+    this.jwt = new JwtService(
+      process.env.JWT_SECRET || "mi_secreto_de_ejemplo"
+    );
     this.getAll = this.getAll.bind(this);
     this.getId = this.getId.bind(this);
     this.post = this.post.bind(this);
     this.put = this.put.bind(this);
     this.patch = this.patch.bind(this);
+    this.recueprarPass = this.recueprarPass.bind(this);
+    this.loginUsuario = this.loginUsuario.bind(this);
+  }
+
+  /**
+   * Realiza el inicio de sesión de un usuario.
+   *
+   * @param {Request} req - La petición HTTP con el cuerpo que contiene el email y la contraseña del usuario.
+   * @param {Response} res - La respuesta HTTP con el token de inicio de sesión.
+   * @returns {Promise<void>} - La promesa que se resuelve cuando se termina de procesar el inicio de sesión.
+   * @throws {Error} - Si ocurre un error al procesar el inicio de sesión.
+   */
+  async loginUsuario(req: Request, res: Response): Promise<void> {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      res
+        .status(400)
+        .json({ message: "El email y la contraseña son requeridos." });
+      return;
+    }
+    try {
+      const usuario = await this._repoUsuario.obtenerPorEmail(email);
+      if (!usuario) {
+        res.status(404).json({ message: "Usuario no encontrado." });
+        return;
+      }
+      const passwordEsValido = await HasheoService.comparePassword(
+        password,
+        usuario.password
+      );
+      if (!passwordEsValido) {
+        res.status(401).json({ message: "Credenciales inválidas." });
+        return;
+      }
+
+      const token = this.jwt.generarToken({
+        userId: usuario.id,
+        userEmail: usuario.email,
+        userName: usuario.nombre,
+        role: "usuario",
+      });
+      res.status(200).json({
+        message: "Inicio de sesión exitoso.",
+        token,
+      });
+    } catch (error) {
+      console.error("Error al procesar el inicio de sesión:", error);
+      res.status(500).json({ message: "Error al procesar la solicitud." });
+    }
   }
 
   /**
@@ -125,6 +184,54 @@ class UsuarioController {
     } catch (error) {
       console.error(`Error al actualizar el usuario con id ${id}:`, error);
       _res.status(500).json({ error: "Error al actualizar el usuario" });
+    }
+  }
+
+  /**
+   * Recupera la contraseña de un usuario mediante su dirección de correo electrónico.
+   * Genera una nueva contraseña aleatoria, la actualiza en la base de datos y
+   * la envía al usuario por correo electrónico.
+   *
+   * @param {Request} req - La solicitud HTTP que contiene el email del usuario.
+   * @param {Response} res - La respuesta HTTP que indica el resultado de la operación.
+   * @returns {Promise<void>} - La promesa que se resuelve cuando se completa la operación.
+   * @throws {Error} - Si ocurre un error al procesar la solicitud de recuperación de contraseña.
+   */
+  async recueprarPass(req: Request, res: Response): Promise<void> {
+    const { email } = req.body;
+    try {
+      const asistente = await this._repoUsuario.obtenerPorEmail(email);
+
+      if (!asistente) {
+        res.status(404).json({ message: "Usuario no encontrado." });
+        return;
+      }
+      const nuevaContraseña = GeneradorAleatorio.generarContraseñaAleatoria(10); //numero de caracteres
+      asistente.password = await HasheoService.hashPassword(nuevaContraseña);
+      const actualizado = await this._repoUsuario.actualizarContraseña(
+        asistente.id,
+        asistente.password
+      );
+
+      if (!actualizado) {
+        res.status(500).json({ message: "Error al actualizar la contraseña." });
+        return;
+      }
+      await this.emailService.enviarCorreo(
+        email,
+        "Nueva Contraseña",
+        `Hola ${asistente.nombre},
+        La nueva contraseña de su cuenta es: ${nuevaContraseña}\n
+      ${asistente}
+        Por su seguridad cambiela inmediatamente despues de ingresar a la plataforma`
+      );
+
+      res.status(200).json({
+        message: "Contraseña actualizada y enviada por correo electrónico.",
+      });
+    } catch (error) {
+      console.error("Error al procesar la solicitud de contraseña:", error);
+      res.status(500).json({ message: "Error al procesar la solicitud." });
     }
   }
 }
