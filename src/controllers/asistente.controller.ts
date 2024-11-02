@@ -53,6 +53,7 @@ class AsistenteController {
     try {
       const asistente = await this._repoAsistente.obtenerPorEmail(email);
       console.log("Asistente encontrado:", asistente?.nombre);
+      console.log("Asistente encontrado:", asistente?.id);
       if (!asistente) {
         res.status(404).json({ message: "Usuario no encontrado." });
         return;
@@ -61,7 +62,6 @@ class AsistenteController {
         password,
         asistente.password
       );
-      console.log("CONTRASEÑA:", asistente.password);
 
       if (!passwordEsValido) {
         res.status(401).json({ message: "Credenciales inválidas." });
@@ -75,9 +75,18 @@ class AsistenteController {
         role: "asistente",
       });
 
+      const refreshToken = this.jwt.generarRefreshToken({
+        userId: asistente.id,
+        userEmail: asistente.email,
+        userName: asistente.nombre,
+        role: "asistente",
+      });
+
+      asistente.password = "***********";
       res.status(200).json({
         message: "Inicio de sesión exitoso.",
         token,
+        refreshToken,
       });
     } catch (error) {
       console.error("Error al procesar el inicio de sesión:", error);
@@ -114,19 +123,22 @@ class AsistenteController {
    * @throws {Error} - Si ocurre un error al obtener el asistente.
    */
   async getId(req: Request, res: Response): Promise<void> {
-    const id = req.params;
+    const email = req.user?.userEmail;
 
+    console.log(req.user);
     try {
-      const asistente = await this._repoAsistente.buscarPorId(Number(id));
+      const asistente = await this._repoAsistente.obtenerPorEmail(email || "");
+
       if (asistente === null) {
         res
           .status(404)
           .json({ error: "No se encuentra el asistente, intente de nuevo" });
         return;
       }
+      asistente.password = "*********";
       res.json(asistente);
     } catch (error) {
-      console.error(`Error al obtener asistente con id ${id}:`, error);
+      console.error(`Error al obtener asistente con id ${email}:`, error);
       res.status(500).json({ error: "Error al obtener asistente" });
     }
   }

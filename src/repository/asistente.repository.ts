@@ -13,8 +13,10 @@ class RepoAsistente implements ICrud<IAsistente>, IMapeo<IAsistente> {
    */
   async obtenerTodos(): Promise<IAsistente[]> {
     try {
-      const resultados = await this.db.consultar("SELECT * FROM asistentes");
-      // console.log(this.mapearResultados(resultados));
+      const resultados = await this.db.consultar(
+        "SELECT nombre,apellido,email,telefono,dni FROM asistentes"
+      );
+
       return this.mapearResultados(resultados);
     } catch (error) {
       console.error("Error al obtener todos los asistentes:", error);
@@ -36,12 +38,13 @@ class RepoAsistente implements ICrud<IAsistente>, IMapeo<IAsistente> {
   async buscarPorId(id: number): Promise<IAsistente | null> {
     try {
       const resultados = await this.db.consultar(
-        "SELECT * FROM asistentes WHERE id = ?",
+        "SELECT id,nombre,apellido,email,password,telefono,dni FROM asistentes WHERE id = ?",
         [id]
       );
       if (resultados.length === 0) {
         return null;
       }
+
       return this.mapearResultados(resultados)[0];
     } catch (error) {
       console.error(`Error al buscar el asistente con id ${id}:`, error);
@@ -135,7 +138,7 @@ class RepoAsistente implements ICrud<IAsistente>, IMapeo<IAsistente> {
   async obtenerPorEmail(email: string): Promise<IAsistente | null> {
     try {
       const resultados = await this.db.consultar(
-        "SELECT * FROM asistentes WHERE email = ?",
+        "SELECT id,nombre,apellido,email,password,telefono,dni FROM asistentes WHERE email = ?",
         [email]
       );
       if (resultados.length === 0) {

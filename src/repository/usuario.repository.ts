@@ -16,7 +16,7 @@ class RepoUsuario implements ICrud<IUsuario>, IMapeo<IUsuario> {
   mapearResultados(resultados: any[]): IUsuario[] {
     return resultados.map((resultado) => ({
       id: resultado.id,
-      nombre: resultado.nombre,
+      nombre: resultado.usuario_nombre,
       apellido: resultado.apellido,
       email: resultado.email,
       telefono: resultado.telefono,
@@ -39,8 +39,20 @@ class RepoUsuario implements ICrud<IUsuario>, IMapeo<IUsuario> {
   async obtenerTodos(): Promise<IUsuario[]> {
     try {
       const resultados = await this.db.consultar(
-        "SELECT *,roles.nombre as rol_nombre FROM usuarios join roles on usuarios.rol_id = roles.id"
+        `SELECT 
+          usuarios.id, 
+          usuarios.nombre AS usuario_nombre, 
+          usuarios.apellido, 
+          usuarios.email, 
+          usuarios.telefono, 
+          usuarios.dni, 
+          usuarios.password, 
+          usuarios.rol_id, 
+          roles.nombre AS rol_nombre
+        FROM usuarios
+        JOIN roles ON usuarios.rol_id = roles.id`
       );
+
       console.log(this.mapearResultados(resultados));
       return this.mapearResultados(resultados);
     } catch (error) {
@@ -48,6 +60,7 @@ class RepoUsuario implements ICrud<IUsuario>, IMapeo<IUsuario> {
       throw new Error("Error al obtener todos los usuarios");
     }
   }
+
   /**
    * Busca un usuario por su id.
    *
@@ -62,7 +75,19 @@ class RepoUsuario implements ICrud<IUsuario>, IMapeo<IUsuario> {
   async buscarPorId(id: number): Promise<IUsuario | null> {
     try {
       const resultados = await this.db.consultar(
-        "SELECT *,roles.nombre as rol_nombre FROM usuarios join roles on usuarios.rol_id = roles.id WHERE usuarios.id = ?",
+        `SELECT 
+          usuarios.id, 
+          usuarios.nombre AS usuario_nombre, 
+          usuarios.apellido, 
+          usuarios.email, 
+          usuarios.telefono, 
+          usuarios.dni, 
+          usuarios.password, 
+          usuarios.rol_id, 
+          roles.nombre AS rol_nombre
+        FROM usuarios
+        JOIN roles ON usuarios.rol_id = roles.id
+        WHERE usuarios.id = ?`,
         [id]
       );
       if (resultados.length === 0) {
@@ -111,6 +136,7 @@ class RepoUsuario implements ICrud<IUsuario>, IMapeo<IUsuario> {
       return null; // Retorna null en caso de error
     }
   }
+
   /**
    * Actualiza un usuario existente en la base de datos, de manera dinamica
    *

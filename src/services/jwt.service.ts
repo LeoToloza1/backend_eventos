@@ -20,6 +20,21 @@ export class JwtService {
   }
 
   /**
+   * Genera un token JWT de refresh para un usuario.
+   *
+   * @param {Object} payload - Datos que se incluirán en el token.
+   * @param {number} expiresIn - Tiempo de expiración en segundos.
+   * @returns {string} - Token JWT de refresh.
+   */
+  public generarRefreshToken(
+    payload: object,
+    expiresIn: number = 604800
+  ): string {
+    console.log("Llega a generar refresh token");
+    return jwt.sign(payload, this.secret, { expiresIn }); // 7 días por defecto
+  }
+
+  /**
    * Verifica un token JWT y devuelve su contenido decodificado.
    *
    * @param {string} token - Token JWT a verificar.
@@ -30,7 +45,7 @@ export class JwtService {
       console.log("Llega a verificar token");
       return jwt.verify(token, this.secret) as JwtPayload;
     } catch (error) {
-      throw new Error("Token inválido o expirado");
+      throw new Error("Token inválido o expirado" + error);
     }
   }
 }

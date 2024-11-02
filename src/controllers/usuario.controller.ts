@@ -60,16 +60,25 @@ class UsuarioController {
         res.status(401).json({ message: "Credenciales inválidas." });
         return;
       }
-
       const token = this.jwt.generarToken({
         userId: usuario.id,
         userEmail: usuario.email,
         userName: usuario.nombre,
         role: "usuario",
       });
+
+      const refreshToken = this.jwt.generarRefreshToken({
+        userId: usuario.id,
+        userEmail: usuario.email,
+        userName: usuario.nombre,
+        role: "usuario",
+      });
+
+      usuario.password = "*********";
       res.status(200).json({
         message: "Inicio de sesión exitoso.",
         token,
+        refreshToken,
       });
     } catch (error) {
       console.error("Error al procesar el inicio de sesión:", error);
@@ -115,6 +124,7 @@ class UsuarioController {
           .json({ error: "No se encuentra el usuario, intente de nuevo" });
         return;
       }
+      usuario.password = "*********";
       res.json(usuario);
     } catch (error) {
       console.error(`Error al obtener usuario con id ${id}:`, error);
