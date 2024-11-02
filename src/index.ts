@@ -50,7 +50,7 @@ class Servidor extends ServidorAbstract {
    */
   private configurarRutas(): void {
     this.app.get("/", (_req: Request, res: Response) => {
-      const index = path.resolve(__dirname, "../index.html");
+      const index = path.resolve(__dirname, "./index.html");
       res.sendFile(index);
     });
     this.app.use("/asistentes", this.asistenteRouter.getRouter());
