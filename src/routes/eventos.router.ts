@@ -12,7 +12,12 @@ class EventosRouter {
     this.configurarRutas();
   }
   private configurarRutas(): void {
-    this.router.get("/", this._auth.autenticado, this.eventoController.getAll);
+    this.router.get(
+      "/",
+      this._auth.autenticado,
+      this._auth.verificarRol(["usuario"]),
+      this.eventoController.getAll
+    );
     this.router.get(
       "/activos",
       this._auth.autenticado,
