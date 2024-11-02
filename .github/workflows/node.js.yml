@@ -47,9 +47,9 @@ jobs:
           cp package-lock.json salida/
           cp index.html salida/
       
-      - name: Instalar dependencias en la carpeta de salida ⌛
-        working-directory: ./salida
-        run: npm install
+      # - name: Instalar dependencias en la carpeta de salida ⌛
+      #   working-directory: ./salida
+      #   run: npm install
      
       - name: chekear carpetas creadas ⌛
         run: ls -l salida/
