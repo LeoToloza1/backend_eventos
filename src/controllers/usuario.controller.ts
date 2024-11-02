@@ -106,7 +106,7 @@ class UsuarioController {
    * @throws {Error} - Si ocurre un error al obtener el usuario.
    */
   async getId(req: Request, res: Response): Promise<void> {
-    const { id } = req.params;
+    const id = req.user?.userId;
     try {
       const usuario = await this._repoUsuario.buscarPorId(Number(id));
       if (usuario === null) {
@@ -154,7 +154,7 @@ class UsuarioController {
    * @throws {Error} - Si ocurre un error al actualizar el usuario.
    */
   async put(_req: Request, res: Response): Promise<void> {
-    const { id } = _req.params;
+    const id = _req.user?.userId;
     const usuario: IUsuario = _req.body;
     try {
       const resultado = await this._repoUsuario.actualizar(Number(id), usuario);
@@ -175,8 +175,7 @@ class UsuarioController {
    * @throws {Error} - Si ocurre un error al actualizar el usuario.
    */
   async patch(_req: Request, _res: Response): Promise<void> {
-    const { id } = _req.params;
-
+    const id = _req.user?.userId;
     const usuario: IUsuario = _req.body;
     try {
       const resultado = await this._repoUsuario.actualizar(Number(id), usuario);
@@ -222,12 +221,56 @@ class UsuarioController {
         "Nueva Contraseña",
         `Hola ${asistente.nombre},
         La nueva contraseña de su cuenta es: ${nuevaContraseña}\n
-      ${asistente}
         Por su seguridad cambiela inmediatamente despues de ingresar a la plataforma`
       );
 
       res.status(200).json({
         message: "Contraseña actualizada y enviada por correo electrónico.",
+      });
+    } catch (error) {
+      console.error("Error al procesar la solicitud de contraseña:", error);
+      res.status(500).json({ message: "Error al procesar la solicitud." });
+    }
+  }
+
+  /**
+   * Cambia la contraseña de un usuario existente.
+   *
+   * @param {Request} req - La solicitud HTTP con el cuerpo que contiene
+   *                         la nueva contraseña.
+   * @param {Response} res - La respuesta HTTP.
+   * @returns {Promise<void>} - La promesa que se resuelve cuando se
+   *                            termina de cambiar la contraseña.
+   * @throws {Error} - Si ocurre un error al cambiar la contraseña.
+   */
+  async cambiarContraseña(req: Request, res: Response): Promise<void> {
+    const passwordNueva = req.body;
+    const email = req.user?.userEmail || "";
+    try {
+      const asistente = await this._repoUsuario.obtenerPorEmail(email);
+
+      if (!asistente) {
+        res.status(404).json({ message: "Usuario no encontrado." });
+        return;
+      }
+      asistente.password = await HasheoService.hashPassword(passwordNueva);
+      const actualizado = await this._repoUsuario.actualizarContraseña(
+        asistente.id,
+        asistente.password
+      );
+      if (!actualizado) {
+        res.status(500).json({ message: "Error al actualizar la contraseña." });
+        return;
+      }
+
+      // await this.emailService.enviarCorreo(
+      //   email,
+      //   "Contraseña actualizada",
+      //   `Su contraseña ha sido actualizada exitosamente.\n
+      //   Por su seguridad, asegúrese de recordar su nueva contraseña.`
+      // );
+      res.status(200).json({
+        message: "Contraseña actualizada correctamente",
       });
     } catch (error) {
       console.error("Error al procesar la solicitud de contraseña:", error);

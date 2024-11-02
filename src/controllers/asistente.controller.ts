@@ -163,7 +163,7 @@ class AsistenteController {
    * @throws {Error} - Si ocurre un error al actualizar el asistente.
    */
   async put(_req: Request, res: Response): Promise<void> {
-    const { id } = _req.params;
+    const id = _req.user?.userId;
     const asistente: IAsistente = _req.body;
     try {
       const resultado = await this._repoAsistente.actualizar(
@@ -188,7 +188,7 @@ class AsistenteController {
    * @throws {Error} - Si ocurre un error al actualizar el asistente.
    */
   async patch(_req: Request, _res: Response): Promise<void> {
-    const { id } = _req.params;
+    const id = _req.user?.userId;
     const asistente: IAsistente = _req.body;
     try {
       const resultado = await this._repoAsistente.actualizar(
@@ -238,7 +238,7 @@ class AsistenteController {
       }
       await this.emailService.enviarCorreo(
         email,
-        "Nueva Contraseña",
+        `${asistente.nombre}: Solicitud de Nueva Contraseña `,
         `Su nueva contraseña es: ${nuevaContraseña}\n
         Por su seguridad cambiela inmediatamente despues de ingresar a la plataforma`
       );
@@ -263,7 +263,8 @@ class AsistenteController {
    * @throws {Error} - Si ocurre un error al cambiar la contraseña.
    */
   async cambiarContraseña(req: Request, res: Response): Promise<void> {
-    const { email, passwordNueva } = req.body;
+    const passwordNueva = req.body;
+    const email = req.user?.userEmail || "";
     try {
       const asistente = await this._repoAsistente.obtenerPorEmail(email);
 
@@ -281,12 +282,12 @@ class AsistenteController {
         return;
       }
 
-      await this.emailService.enviarCorreo(
-        email,
-        "Contraseña actualizada",
-        `Su contraseña ha sido actualizada exitosamente.\n
-        Por su seguridad, asegúrese de recordar su nueva contraseña.`
-      );
+      // await this.emailService.enviarCorreo(
+      //   email,
+      //   "Contraseña actualizada",
+      //   `Su contraseña ha sido actualizada exitosamente.\n
+      //   Por su seguridad, asegúrese de recordar su nueva contraseña.`
+      // );
       res.status(200).json({
         message:
           "Contraseña actualizada y se ha enviado un correo electrónico.",
