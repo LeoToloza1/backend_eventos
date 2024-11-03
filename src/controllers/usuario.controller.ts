@@ -27,6 +27,7 @@ class UsuarioController {
     this.patch = this.patch.bind(this);
     this.recueprarPass = this.recueprarPass.bind(this);
     this.loginUsuario = this.loginUsuario.bind(this);
+    this.refreshToken = this.refreshToken.bind(this);
   }
 
   /**
@@ -73,12 +74,12 @@ class UsuarioController {
         userName: usuario.nombre,
         role: "usuario",
       });
-
+      await this._repoUsuario.actualizarRefreshToken(usuario.id, refreshToken);
       usuario.password = "*********";
       res.status(200).json({
         message: "Inicio de sesión exitoso.",
         token,
-        refreshToken,
+        id: usuario.id,
       });
     } catch (error) {
       console.error("Error al procesar el inicio de sesión:", error);
@@ -209,17 +210,17 @@ class UsuarioController {
   async recueprarPass(req: Request, res: Response): Promise<void> {
     const { email } = req.body;
     try {
-      const asistente = await this._repoUsuario.obtenerPorEmail(email);
+      const usuario = await this._repoUsuario.obtenerPorEmail(email);
 
-      if (!asistente) {
+      if (!usuario) {
         res.status(404).json({ message: "Usuario no encontrado." });
         return;
       }
       const nuevaContraseña = GeneradorAleatorio.generarContraseñaAleatoria(10); //numero de caracteres
-      asistente.password = await HasheoService.hashPassword(nuevaContraseña);
+      usuario.password = await HasheoService.hashPassword(nuevaContraseña);
       const actualizado = await this._repoUsuario.actualizarContraseña(
-        asistente.id,
-        asistente.password
+        usuario.id,
+        usuario.password
       );
 
       if (!actualizado) {
@@ -229,7 +230,7 @@ class UsuarioController {
       await this.emailService.enviarCorreo(
         email,
         "Nueva Contraseña",
-        `Hola ${asistente.nombre},
+        `Hola ${usuario.nombre},
         La nueva contraseña de su cuenta es: ${nuevaContraseña}\n
         Por su seguridad cambiela inmediatamente despues de ingresar a la plataforma`
       );
@@ -257,16 +258,16 @@ class UsuarioController {
     const passwordNueva = req.body;
     const email = req.user?.userEmail || "";
     try {
-      const asistente = await this._repoUsuario.obtenerPorEmail(email);
+      const usuario = await this._repoUsuario.obtenerPorEmail(email);
 
-      if (!asistente) {
+      if (!usuario) {
         res.status(404).json({ message: "Usuario no encontrado." });
         return;
       }
-      asistente.password = await HasheoService.hashPassword(passwordNueva);
+      usuario.password = await HasheoService.hashPassword(passwordNueva);
       const actualizado = await this._repoUsuario.actualizarContraseña(
-        asistente.id,
-        asistente.password
+        usuario.id,
+        usuario.password
       );
       if (!actualizado) {
         res.status(500).json({ message: "Error al actualizar la contraseña." });
@@ -285,6 +286,56 @@ class UsuarioController {
     } catch (error) {
       console.error("Error al procesar la solicitud de contraseña:", error);
       res.status(500).json({ message: "Error al procesar la solicitud." });
+    }
+  }
+
+  /**
+   * Renueva el token de acceso de un usuario con base en el refresh token
+   * proporcionado.
+   *
+   * @param {Request} req - La solicitud HTTP con el cuerpo que contiene el
+   *                        refresh token.
+   * @param {Response} res - La respuesta HTTP con el nuevo token de acceso.
+   * @returns {Promise<void>} - La promesa que se resuelve cuando se
+   *                            termina de renovar el token.
+   * @throws {Error} - Si ocurre un error al renovar el token.
+   */
+  async refreshToken(req: Request, res: Response): Promise<void> {
+    const { id } = req.params;
+
+    try {
+      const tokenDB = await this._repoUsuario.buscarRefreshToken(Number(id));
+      if (!tokenDB) {
+        res.status(401).json({ message: "Refresh token requerido." });
+        return;
+      }
+      const payload = this.jwt.verificarToken(tokenDB as string);
+      if (!payload) {
+        res.status(403).json({ message: "Refresh token inválido." });
+        return;
+      }
+
+      const usuario = await this._repoUsuario.buscarPorId(payload.userId);
+      if (!usuario) {
+        res.status(404).json({ message: "Usuario no encontrado." });
+        return;
+      }
+      const newToken = this.jwt.generarToken({
+        userId: usuario.id,
+        userEmail: usuario.email,
+        userName: usuario.nombre,
+        role: "usuario",
+      });
+
+      res.status(200).json({
+        message: "Tokens renovados con éxito.",
+        token: newToken,
+      });
+    } catch (error) {
+      console.error("Error al renovar el token:", error);
+      res
+        .status(500)
+        .json({ message: "Error al procesar la solicitud de renovación." });
     }
   }
 }

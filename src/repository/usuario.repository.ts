@@ -180,14 +180,14 @@ class RepoUsuario implements ICrud<IUsuario>, IMapeo<IUsuario> {
    * Busca un usuario por su email.
    *
    * @param {string} email - El email del usuario a buscar.
-   * @returns {Promise<IAsistente | null>} - Un objeto Asistente con los
+   * @returns {Promise<IUsuario | null>} - Un objeto Usuario con los
    *                                       resultados de la consulta o null
    *                                       si no se encuentra un usuario
    *                                       con el email especificado.
    * @throws {Error} - Si ocurre un error al buscar el usuario con el email
    *                  especificado.
    */
-  async obtenerPorEmail(email: string): Promise<IAsistente | null> {
+  async obtenerPorEmail(email: string): Promise<IUsuario | null> {
     try {
       const resultados = await this.db.consultar(
         "SELECT * FROM usuarios WHERE email = ?",
@@ -226,6 +226,60 @@ class RepoUsuario implements ICrud<IUsuario>, IMapeo<IUsuario> {
         error
       );
       return false;
+    }
+  }
+
+  /**
+   * Actualiza el refresh token de un usuario en la base de datos.
+   *
+   * @param {number} id - El id del usuario cuyo refresh token se actualizará.
+   * @param {string} refreshToken - El nuevo refresh token a establecer.
+   * @returns {Promise<boolean>} - true si se actualiza el refresh token
+   *                              correctamente, false si ocurre un error.
+   * @throws {Error} - Si ocurre un error al actualizar el refresh token.
+   */
+  async actualizarRefreshToken(
+    id: number,
+    refreshToken: string
+  ): Promise<boolean> {
+    try {
+      const sql = `UPDATE usuarios SET refresh_token = ? WHERE id = ?`;
+      await this.db.consultar(sql, [refreshToken, id]);
+      return true;
+    } catch (error) {
+      console.error(
+        `Error al actualizar el refresh token del usuario con id ${id}:`,
+        error
+      );
+      return false;
+    }
+  }
+
+  /**
+   * Busca el refresh token de un usuario en la base de datos.
+   *
+   * @param {number} id - El id del usuario cuyo refresh token se buscará.
+   * @returns {Promise<string | null>} - El refresh token del usuario o null
+   *                                    si no se encuentra.
+   * @throws {Error} - Si ocurre un error al buscar el refresh token del usuario.
+   */
+
+  async buscarRefreshToken(id: number): Promise<string | null> {
+    try {
+      const sql = `SELECT refresh_token FROM usuarios WHERE id = ?`;
+      const resultados = await this.db.consultar(sql, [id]);
+      if (resultados.length === 0) {
+        return null;
+      }
+      return resultados[0].refresh_token;
+    } catch (error) {
+      console.error(
+        `Error al buscar el refresh token del usuario con id ${id}:`,
+        error
+      );
+      throw new Error(
+        `Error al buscar el refresh token del usuario con id ${id}`
+      );
     }
   }
 }

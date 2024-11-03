@@ -62,6 +62,7 @@ class AsistenteRouter {
       this._auth.verificarRol(["asistente"]),
       this.asistenteController.getId
     ); //✅
+    this.router.get("/perfil/:id", this.asistenteController.refreshToken);
   }
 
   /**

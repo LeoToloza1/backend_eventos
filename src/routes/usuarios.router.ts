@@ -61,6 +61,7 @@ class UsuarioRouter {
       this._auth.autenticado,
       this.usuarioController.getId
     );
+    this.router.get("/perfil/:id", this.usuarioController.refreshToken);
   }
 
   /**

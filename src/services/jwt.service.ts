@@ -16,7 +16,7 @@ export class JwtService {
    */
   public generarToken(payload: object, expiresIn: number = 3600): string {
     console.log("Llega a generar token");
-    return jwt.sign(payload, this.secret, { expiresIn });
+    return jwt.sign(payload, this.secret, { expiresIn }); //1 hora por defecto
   }
 
   /**
@@ -28,10 +28,10 @@ export class JwtService {
    */
   public generarRefreshToken(
     payload: object,
-    expiresIn: number = 604800
+    expiresIn: number = 2592000
   ): string {
     console.log("Llega a generar refresh token");
-    return jwt.sign(payload, this.secret, { expiresIn }); // 7 días por defecto
+    return jwt.sign(payload, this.secret, { expiresIn }); // 30 días por defecto
   }
 
   /**
