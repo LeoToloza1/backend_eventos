@@ -166,7 +166,7 @@ class UsuarioController {
    */
   async put(_req: Request, res: Response): Promise<void> {
     const id = _req.user?.userId;
-    const usuario: IUsuario = _req.body;
+    const usuario = _req.body;
     try {
       const resultado = await this._repoUsuario.actualizar(Number(id), usuario);
       res.json(resultado);

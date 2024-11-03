@@ -41,12 +41,12 @@ class UsuarioRouter {
       this.usuarioController.post
     ); //✅
     this.router.put(
-      "/actualizar/:id",
+      "/actualizar",
       this._auth.autenticado,
       this.usuarioController.put
     ); //✅
     this.router.patch(
-      "/parcial/:id",
+      "/parcial",
       this._auth.autenticado,
       this.usuarioController.patch
     ); //✅

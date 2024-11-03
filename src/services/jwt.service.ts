@@ -14,7 +14,7 @@ export class JwtService {
    * @param {number} expiresIn - Tiempo de expiración en segundos.
    * @returns {string} - Token JWT.
    */
-  public generarToken(payload: object, expiresIn: number = 3600): string {
+  public generarToken(payload: object, expiresIn: number = 120): string {
     console.log("Llega a generar token");
     return jwt.sign(payload, this.secret, { expiresIn }); //1 hora por defecto
   }
