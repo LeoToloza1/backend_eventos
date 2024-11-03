@@ -26,6 +26,7 @@ class AsistenteRouter {
   private configurarRutas(): void {
     this.router.get(
       "/",
+      this._auth.autenticado,
       this._auth.verificarRol(["usuario"]),
       this.asistenteController.getAll
     ); //✅
