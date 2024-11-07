@@ -24,6 +24,11 @@ class EventosRouter {
       this.eventoController.getAllActive
     );
     this.router.get(
+      "/nombre",
+      this._auth.autenticado,
+      this.eventoController.buscarPorNombre
+    );
+    this.router.get(
       "/:id",
       this._auth.autenticado,
       this.eventoController.getId
@@ -45,11 +50,6 @@ class EventosRouter {
       this._auth.autenticado,
       this._auth.verificarRol(["usuario"]),
       this.eventoController.patch
-    );
-    this.router.get(
-      "/nombre",
-      this._auth.autenticado,
-      this.eventoController.buscarPorNombre
     );
   }
 
