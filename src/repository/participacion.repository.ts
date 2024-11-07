@@ -1,7 +1,5 @@
 import Conectar from "../db/config_db";
-class RepoParticipacion
-  implements ICrud<IParticipacion>, IMapeo<IParticipacion>
-{
+class RepoParticipacion implements IMapeo<IParticipacion> {
   constructor(private readonly db: Conectar) {}
 
   async obtenerTodos(): Promise<IParticipacion[]> {
@@ -50,14 +48,17 @@ class RepoParticipacion
     }
   }
 
-  async crear(item: IParticipacion): Promise<IParticipacion | null> {
+  async crear(
+    item: Participacion,
+    asistente: number
+  ): Promise<Participacion | null> {
     try {
       const sql =
-        "INSERT INTO participacion (asistente_id, evento_id, confirmacion, asistencia_real) VALUES (?, ?, ?, ?)";
-      const { asistente_id, evento_id, confirmacion, asistencia_real } = item;
+        "INSERT INTO participacion (asistente_id, evento_id, confirmacion) VALUES (?, ?, 1)";
+      const { evento, confirmacion, asistencia_real } = item;
       await this.db.consultar(sql, [
-        asistente_id,
-        evento_id,
+        asistente,
+        evento,
         confirmacion,
         asistencia_real,
       ]);
@@ -92,31 +93,119 @@ class RepoParticipacion
     }
   }
 
+  /**
+   * Marca una participacion como realizada en la base de datos
+   *
+   * @param {number} id - El id de la participacion a marcar como realizada.
+   * @returns {Promise<boolean>} - true si se marca como realizada correctamente,
+   *                              false si ocurre un error.
+   * @throws {Error} - Si ocurre un error al marcar la participacion como realizada.
+   */
+  async asistenciaReal(id: number): Promise<boolean> {
+    try {
+      const sql = "UPDATE participacion SET asistencia_real = ? WHERE id = ?";
+      const asistenciaReal = true;
+      await this.db.consultar(sql, [asistenciaReal, id]);
+      return true;
+    } catch (error) {
+      console.error(
+        `Error al actualizar la participación con id ${id}:`,
+        error
+      );
+      return false;
+    }
+  }
+
+  /**
+   * Confirma la asistencia de un asistente en una participacion en la base de datos.
+   *
+   * @param {number} id - El id del asistente que se va a confirmar.
+   * @returns {Promise<boolean>} - true si se confirma correctamente,
+   *                              false si ocurre un error.
+   * @throws {Error} - Si ocurre un error al confirmar la asistencia del
+   *                  asistente con el id especificado.
+   */
+  async confirmarAsistencia(id: number): Promise<boolean> {
+    try {
+      const sql =
+        "UPDATE participacion SET confirmacion = ? WHERE asistente_id = ?";
+      const confirmacion = true;
+      await this.db.consultar(sql, [confirmacion, id]);
+      return true;
+    } catch (error) {
+      console.error(
+        `Error al confirmar la asistencia del asistente: ${id}:`,
+        error
+      );
+      return false;
+    }
+  }
+
+  /**
+   * Busca las participaciones de un evento por su nombre.
+   *
+   * @param {string} evento - El nombre del evento a buscar.
+   * @returns {Promise<IParticipacion[]>} - Un array de objetos IParticipacion
+   *                                       con los resultados de la consulta.
+   * @throws {Error} - Si ocurre un error al buscar las participaciones del
+   *                   evento.
+   */
+  async buscarPorEvento(evento: string): Promise<IParticipacion[]> {
+    try {
+      const sql = `Select e.nombre,
+                e.ubicacion,
+                e.fecha,
+                e.descripcion,
+                e.realizado, 
+                CONCAT(a.nombre, ' ', a.apellido) AS Asistente,
+                p.confirmacion,
+                p.asistencia_real
+                FROM participacion p
+                JOIN eventos e ON p.evento_id = e.id
+                JOIN asistentes a ON p.asistente_id = a.id
+                WHERE e.nombre LIKE ?;`;
+      const resultados = await this.db.consultar(sql, [`${evento}%`]);
+      if (resultados.length === 0) {
+        throw new Error("No se encontraron resultados");
+      }
+      return this.mapearResultados(resultados);
+    } catch (error) {
+      console.error("Error al buscar por evento:", error);
+      throw new Error("Error al buscar por evento");
+    }
+  }
+
   mapearResultados(resultados: any[]): IParticipacion[] {
-    console.log(resultados);
-    return resultados.map((resultado) => ({
-      id: resultado.id,
-      confirmacion: resultado.confirmacion,
-      asistencia_real: resultado.asistencia_real,
-      asistente_id: resultado.asistente_id,
-      evento_id: resultado.evento_id,
-      asistente: {
+    const participacionesMap: { [key: number]: IParticipacion } = {};
+    resultados.forEach((resultado) => {
+      if (!participacionesMap[resultado.id]) {
+        participacionesMap[resultado.id] = {
+          id: resultado.id,
+          confirmacion: resultado.confirmacion,
+          asistencia_real: resultado.asistencia_real,
+          evento_id: resultado.evento_id,
+          asistentes: [],
+          evento: {
+            id: resultado.evento_id,
+            nombre: resultado.evento_nombre,
+            ubicacion: resultado.evento_ubicacion,
+            fecha: resultado.evento_fecha,
+            descripcion: resultado.evento_descripcion,
+            realizado: resultado.evento_realizado,
+          },
+        };
+      }
+
+      participacionesMap[resultado.id].asistentes.push({
         id: resultado.asistente_id,
         nombre: resultado.asistente_nombre,
         apellido: resultado.asistente_apellido,
         email: resultado.asistente_email,
         telefono: resultado.asistente_telefono,
         dni: resultado.asistente_dni,
-      },
-      evento: {
-        id: resultado.evento_id,
-        nombre: resultado.evento_nombre,
-        ubicacion: resultado.evento_ubicacion,
-        fecha: resultado.evento_fecha,
-        descripcion: resultado.evento_descripcion,
-        realizado: resultado.evento_realizado,
-      },
-    }));
+      });
+    });
+    return Object.values(participacionesMap);
   }
 }
 export default RepoParticipacion;

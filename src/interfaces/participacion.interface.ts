@@ -1,7 +1,9 @@
 interface IParticipacion {
   id: number;
-  asistente_id: number;
-  evento_id: number;
+  evento_id?: number;
+  asistente_id?: number;
+  asistentes: IPersona[];
+  evento: IEventos;
   confirmacion: boolean;
   asistencia_real?: boolean;
 }

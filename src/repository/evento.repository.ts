@@ -125,6 +125,38 @@ class RepoEvento implements ICrud<IEventos>, IMapeo<IEventos> {
     }
   }
 
+  //par aun buscardo
+
+  /**
+   * Busca todos los eventos que contengan el nombre especificado.
+   *
+   * @param {string} nombre - El nombre a buscar.
+   * @returns {Promise<IEventos[]>} - Un array de objetos IEventos con los
+   *                                  resultados de la consulta.
+   * @throws {Error} - Si ocurre un error al obtener los eventos con el nombre
+   *                  especificado.
+   */
+  async buscarPorNombre(nombre: string): Promise<IEventos[]> {
+    try {
+      const sql = `
+      Select id,
+        nombre,
+        ubicacion,
+        DATE_FORMAT(fecha, '%d-%m-%y') AS fecha,
+        descripcion,
+        realizado 
+        FROM eventos 
+        WHERE realizado = 0
+        AND nombre LIKE ?
+        ORDER BY fecha;`;
+      const resultados = await this.db.consultar(sql, [`${nombre}%`]);
+      return this.mapearResultados(resultados);
+    } catch (error) {
+      console.error("Error al obtener todos los eventos:", error);
+      throw new Error("Error al obtener todos los eventos");
+    }
+  }
+
   /**
    * Mapea los resultados de una consulta a una lista de objetos Eventos.
    *

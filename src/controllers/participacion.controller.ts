@@ -13,9 +13,11 @@ class ParticipacionController {
     this._repoParticipacion = RepoParticipacion;
     this.getAll = this.getAll.bind(this);
     this.getId = this.getId.bind(this);
-    this.post = this.post.bind(this);
+    this.post = this.post.bind(this); //usuario asistente
     this.put = this.put.bind(this);
     this.patch = this.patch.bind(this);
+    this.asistenciaReal = this.asistenciaReal.bind(this); //router para usuario
+    this.confirmarAsistencia = this.confirmarAsistencia.bind(this); //router para asistente
   }
 
   /**
@@ -78,8 +80,12 @@ class ParticipacionController {
    */
   async post(_req: Request, res: Response): Promise<void> {
     try {
-      const participacion: IParticipacion = _req.body;
-      const resultado = await this._repoParticipacion.crear(participacion);
+      const participacion = _req.body;
+      const asistente = _req.user?.userId;
+      const resultado = await this._repoParticipacion.crear(
+        participacion,
+        Number(asistente)
+      );
       res.json(resultado);
     } catch (error) {
       console.error("Error al crear el asistente:", error);
@@ -134,6 +140,84 @@ class ParticipacionController {
     } catch (error) {
       console.error(`Error al actualizar el asistente con id ${id}:`, error);
       _res.status(500).json({ error: "Error al actualizar el asistente" });
+    }
+  }
+
+  /**
+   * Marca una participacion como realizada en la base de datos.
+   *
+   * @param {Request} _req - La peticion HTTP con el id de la participacion.
+   * @param {Response} res - La respuesta HTTP.
+   * @returns {Promise<void>} - La promesa que se resuelve cuando se
+   *                            termina de marcar la participacion como realizada.
+   * @throws {Error} - Si ocurre un error al marcar la participacion como realizada.
+   */
+  async asistenciaReal(_req: Request, res: Response): Promise<void> {
+    const { id } = _req.params;
+    try {
+      const resultado = await this._repoParticipacion.asistenciaReal(
+        Number(id)
+      );
+      const responseMessage = resultado
+        ? { msj: "Asistencia marcada correctamente!" }
+        : { msj: "No se pudo marcar la asistencia como realizada" };
+      res.json(responseMessage);
+    } catch (error) {
+      console.error(`Error al marcar la participacion con id ${id}:`, error);
+      res.status(500).json({ error: "Error al marcar la participacion" });
+    }
+  }
+
+  /**
+   * Confirma la asistencia de un asistente en una participacion.
+   *
+   * @param {Request} _req - La peticion HTTP que contiene el usuario que se va a confirmar.
+   * @param {Response} res - La respuesta HTTP.
+   * @returns {Promise<void>} - La promesa que se resuelve cuando se termina de
+   *                            confirmar la asistencia.
+   * @throws {Error} - Si ocurre un error al confirmar la asistencia.
+   */
+  async confirmarAsistencia(_req: Request, res: Response): Promise<void> {
+    const id = _req.user?.userId;
+    try {
+      const resultado = await this._repoParticipacion.confirmarAsistencia(
+        Number(id)
+      );
+      const responseMessage = resultado
+        ? { msj: "Asistencia confirmada correctamente!" }
+        : { msj: "No se pudo confirmar la asistencia" };
+      res.json(responseMessage);
+    } catch (error) {
+      console.error(`Error al confirmar la asistencia con id ${id}:`, error);
+      res.status(500).json({ error: "Error al confirmar la asistencia" });
+    }
+  }
+
+  /**
+   * Busca las participaciones de un evento por su nombre y devuelve los resultados.
+   *
+   * @param {Request} req - La petición HTTP que contiene el nombre del evento a buscar en la consulta.
+   * @param {Response} res - La respuesta HTTP que contiene las participaciones encontradas o un error.
+   * @returns {Promise<void>} - La promesa que se resuelve cuando se completa la operación de búsqueda.
+   * @throws {Error} - Si ocurre un error al obtener las participaciones del evento especificado.
+   */
+  async partipacionPorEvento(req: Request, res: Response) {
+    const nombre: string = req.query.nombre as string;
+    try {
+      const nombreValid = nombre.trim();
+      if (!nombreValid) {
+        res.status(400).json({ error: "El nombre no puede estar vacío" });
+        return;
+      }
+      const evento = await this._repoParticipacion.buscarPorEvento(nombreValid);
+      if (!evento) {
+        res.status(404).json({ error: "No se encuentra el evento" });
+        return;
+      }
+      res.json(evento);
+    } catch (error) {
+      console.error(`Error al obtener el evento con nombre: ${nombre}:`, error);
+      res.status(500).json({ error: "Error al obtener el evento" });
     }
   }
 }

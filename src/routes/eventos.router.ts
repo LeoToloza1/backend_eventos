@@ -46,6 +46,11 @@ class EventosRouter {
       this._auth.verificarRol(["usuario"]),
       this.eventoController.patch
     );
+    this.router.get(
+      "/nombre",
+      this._auth.autenticado,
+      this.eventoController.buscarPorNombre
+    );
   }
 
   getRouter(): Router {

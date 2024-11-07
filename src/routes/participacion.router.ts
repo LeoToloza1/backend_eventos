@@ -40,6 +40,24 @@ class ParticipacionRouter {
       this._auth.verificarRol(["usuario", "asistente"]),
       this.participacionController.patch
     );
+    this.router.get(
+      "/por-evento",
+      this._auth.autenticado,
+      this.participacionController.partipacionPorEvento
+    );
+    this.router.patch(
+      "/confirmar",
+      this._auth.autenticado,
+      this._auth.verificarRol(["asistente"]),
+      this.participacionController.confirmarAsistencia
+    );
+
+    this.router.patch(
+      "/realizado/:id",
+      this._auth.autenticado,
+      this._auth.verificarRol(["usuario"]),
+      this.participacionController.asistenciaReal
+    );
   }
 
   getRouter(): Router {

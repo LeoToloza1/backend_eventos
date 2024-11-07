@@ -11,6 +11,7 @@ class EventoController {
     this.post = this.post.bind(this);
     this.put = this.put.bind(this);
     this.patch = this.patch.bind(this);
+    this.buscarPorNombre = this.buscarPorNombre.bind(this);
   }
 
   /**
@@ -138,6 +139,34 @@ class EventoController {
     } catch (error) {
       console.error(`Error al actualizar el evento con id ${id}:`, error);
       _res.status(500).json({ error: "Error al actualizar el evento" });
+    }
+  }
+
+  /**
+   * Busca eventos por nombre en la base de datos y devuelve los resultados.
+   *
+   * @param {Request} req - La petición HTTP que contiene el nombre a buscar en la consulta.
+   * @param {Response} res - La respuesta HTTP que contiene los eventos encontrados o un error.
+   * @returns {Promise<void>} - La promesa que se resuelve cuando se completa la operación de búsqueda.
+   * @throws {Error} - Si ocurre un error al obtener los eventos con el nombre especificado.
+   */
+  async buscarPorNombre(req: Request, res: Response): Promise<void> {
+    const nombre: string = req.query.nombre as string;
+    try {
+      const nombreValid = nombre.trim();
+      if (!nombreValid) {
+        res.status(400).json({ error: "El nombre no puede estar vacío" });
+        return;
+      }
+      const evento = await this._repoEvento.buscarPorNombre(nombreValid);
+      if (!evento) {
+        res.status(404).json({ error: "No se encuentra el evento" });
+        return;
+      }
+      res.json(evento);
+    } catch (error) {
+      console.error(`Error al obtener el evento con nombre: ${nombre}:`, error);
+      res.status(500).json({ error: "Error al obtener el evento" });
     }
   }
 }
