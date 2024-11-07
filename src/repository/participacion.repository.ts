@@ -152,18 +152,26 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
    */
   async buscarPorEvento(evento: string): Promise<IParticipacion[]> {
     try {
-      const sql = `Select e.nombre,
-                e.ubicacion,
-                e.fecha,
-                e.descripcion,
-                e.realizado, 
-                CONCAT(a.nombre, ' ', a.apellido) AS Asistente,
-                p.confirmacion,
-                p.asistencia_real
+      const sql = `SELECT p.id, 
+                   p.confirmacion, 
+                   p.asistencia_real, 
+                   a.id AS asistente_id, 
+                   a.nombre AS asistente_nombre, 
+                   a.apellido AS asistente_apellido, 
+                   a.email AS asistente_email, 
+                   a.telefono AS asistente_telefono, 
+                   a.dni AS asistente_dni, 
+                   e.id AS evento_id, 
+                   e.nombre AS evento_nombre, 
+                   e.ubicacion AS evento_ubicacion, 
+                   e.fecha AS evento_fecha, 
+                   e.descripcion AS evento_descripcion, 
+                   e.realizado AS evento_realizado
                 FROM participacion p
                 JOIN eventos e ON p.evento_id = e.id
                 JOIN asistentes a ON p.asistente_id = a.id
                 WHERE e.nombre LIKE ?;`;
+
       const resultados = await this.db.consultar(sql, [`${evento}%`]);
       if (resultados.length === 0) {
         throw new Error("No se encontraron resultados");
@@ -177,6 +185,7 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
 
   mapearResultados(resultados: any[]): IParticipacion[] {
     const participacionesMap: { [key: number]: IParticipacion } = {};
+
     resultados.forEach((resultado) => {
       if (!participacionesMap[resultado.id]) {
         participacionesMap[resultado.id] = {
@@ -184,7 +193,14 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
           confirmacion: resultado.confirmacion,
           asistencia_real: resultado.asistencia_real,
           evento_id: resultado.evento_id,
-          asistentes: [],
+          asistente: {
+            id: resultado.asistente_id,
+            nombre: resultado.asistente_nombre,
+            apellido: resultado.asistente_apellido,
+            email: resultado.asistente_email,
+            telefono: resultado.asistente_telefono,
+            dni: resultado.asistente_dni,
+          },
           evento: {
             id: resultado.evento_id,
             nombre: resultado.evento_nombre,
@@ -195,16 +211,8 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
           },
         };
       }
-
-      participacionesMap[resultado.id].asistentes.push({
-        id: resultado.asistente_id,
-        nombre: resultado.asistente_nombre,
-        apellido: resultado.asistente_apellido,
-        email: resultado.asistente_email,
-        telefono: resultado.asistente_telefono,
-        dni: resultado.asistente_dni,
-      });
     });
+
     return Object.values(participacionesMap);
   }
 }
