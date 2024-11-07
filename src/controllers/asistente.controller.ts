@@ -29,6 +29,7 @@ class AsistenteController {
     this.recuperarPass = this.recuperarPass.bind(this);
     this.cambiarContraseña = this.cambiarContraseña.bind(this);
     this.loginAsistente = this.loginAsistente.bind(this);
+    this.refreshToken = this.refreshToken.bind(this);
   }
 
   /**
