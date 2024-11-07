@@ -18,6 +18,7 @@ class ParticipacionController {
     this.patch = this.patch.bind(this);
     this.asistenciaReal = this.asistenciaReal.bind(this); //router para usuario
     this.confirmarAsistencia = this.confirmarAsistencia.bind(this); //router para asistente
+    this.partipacionPorEvento = this.partipacionPorEvento.bind(this);
   }
 
   /**
