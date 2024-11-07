@@ -203,6 +203,7 @@ class ParticipacionController {
    */
   async partipacionPorEvento(req: Request, res: Response) {
     const nombre: string = req.query.nombre as string;
+    console.log("Llega del request: " + nombre);
     try {
       const nombreValid = nombre.trim();
       if (!nombreValid) {
