@@ -46,7 +46,7 @@ class ParticipacionRouter {
       this.participacionController.patch
     );
 
-    this.router.patch(
+    this.router.get(
       "/confirmar",
       this._auth.autenticado,
       this._auth.verificarRol(["asistente"]),
