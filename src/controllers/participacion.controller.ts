@@ -82,7 +82,9 @@ class ParticipacionController {
   async post(_req: Request, res: Response): Promise<void> {
     try {
       const participacion = _req.body;
+      console.log("BODY PARTICIPACION", _req.body);
       const asistente = _req.user?.userId;
+      console.log("ASISTENTE", asistente);
       const resultado = await this._repoParticipacion.crear(
         participacion,
         Number(asistente)
