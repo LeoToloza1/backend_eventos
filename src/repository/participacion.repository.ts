@@ -49,20 +49,20 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
   }
 
   async crear(
-    item: Participacion,
+    item: IParticipacion,
     asistente: number
-  ): Promise<Participacion | null> {
+  ): Promise<IParticipacion | null> {
     try {
       const sql =
         "INSERT INTO participacion (asistente_id, evento_id, confirmacion) VALUES (?, ?, 1)";
-      const { evento } = item;
+      const { evento_id } = item;
       console.log("ITEM", item);
       console.log("asistente id: ", asistente);
       console.log(
         "SQL: -->",
-        await this.db.consultar(sql, [asistente, evento])
+        await this.db.consultar(sql, [asistente, evento_id])
       );
-      await this.db.consultar(sql, [asistente, evento]);
+      await this.db.consultar(sql, [asistente, evento_id]);
       console.log("participacion creado -->", item);
       return item;
     } catch (error) {
