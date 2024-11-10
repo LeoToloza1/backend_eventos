@@ -58,12 +58,11 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
       const { evento } = item;
       console.log("ITEM", item);
       console.log("asistente id: ", asistente);
-      await this.db.consultar(sql, [asistente, evento]);
-
       console.log(
-        "consulta sql: ",
+        "SQL: -->",
         await this.db.consultar(sql, [asistente, evento])
       );
+      await this.db.consultar(sql, [asistente, evento]);
       console.log("participacion creado -->", item);
       return item;
     } catch (error) {
