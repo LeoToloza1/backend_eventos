@@ -23,6 +23,16 @@ class ParticipacionRouter {
       this.participacionController.partipacionPorEvento
     );
     this.router.get(
+      "/mis-eventos",
+      this._auth.autenticado,
+      this.participacionController.eventosPorAsistente
+    );
+    this.router.get(
+      "/sin-confirmar",
+      this._auth.autenticado,
+      this.participacionController.eventosSinConfirmar
+    );
+    this.router.get(
       "/:id",
       this._auth.autenticado,
       this.participacionController.getId

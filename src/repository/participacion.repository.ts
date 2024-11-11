@@ -178,6 +178,83 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
     }
   }
 
+  /**
+   * Busca las participaciones de un asistente por su id.
+   *
+   * @param {number} id - El id del asistente a buscar.
+   * @returns {Promise<IParticipacion[]>} - Un array de objetos IParticipacion
+   *                                       con los resultados de la consulta.
+   * @throws {Error} - Si ocurre un error al buscar las participaciones del
+   *                  asistente.
+   */
+  async obtenerPorAsistente(id: number) {
+    try {
+      const sql = `SELECT p.id, 
+                 p.confirmacion, 
+                 p.asistencia_real, 
+                 a.id AS asistente_id, 
+                 a.nombre AS asistente_nombre, 
+                 a.apellido AS asistente_apellido, 
+                 a.email AS asistente_email, 
+                 a.telefono AS asistente_telefono, 
+                 a.dni AS asistente_dni, 
+                 e.id AS evento_id, 
+                 e.nombre AS evento_nombre, 
+                 e.ubicacion AS evento_ubicacion, 
+                 e.fecha AS evento_fecha, 
+                 e.descripcion AS evento_descripcion, 
+                 e.realizado AS evento_realizado
+              FROM participacion p
+              JOIN eventos e ON p.evento_id = e.id
+              JOIN asistentes a ON p.asistente_id = a.id
+              WHERE p.asistente_id = ?;`;
+      const resultados = await this.db.consultar(sql, [id]);
+      if (resultados.length === 0) {
+        return [];
+      }
+      console.log(resultados);
+      if (resultados.length === 0) {
+        throw new Error("No se encontraron resultados");
+      }
+      return this.mapearResultados(resultados);
+    } catch (error) {
+      console.error("Error al buscar por asistente:", error);
+      throw new Error("Error al buscar por asistente");
+    }
+  }
+
+  /**
+   * Obtiene los eventos no confirmados por un asistente específico.
+   *
+   * @param {number} id - El id del asistente para verificar sus eventos no confirmados.
+   * @returns {Promise<IParticipacion[]>} - Una lista de objetos IParticipacion que representan los eventos
+   *                                        no confirmados por el asistente especificado.
+   * @throws {Error} - Si ocurre un error al buscar eventos sin confirmar.
+   */
+
+  async eventosSinCnfirmar(id: number): Promise<IParticipacion[]> {
+    try {
+      const sql = `SELECT 
+          e.id AS evento_id, 
+          e.nombre AS evento_nombre, 
+          e.ubicacion AS evento_ubicacion, 
+          e.fecha AS evento_fecha, 
+          e.descripcion AS evento_descripcion, 
+          e.realizado AS evento_realizado
+          FROM 
+              eventos e
+          LEFT JOIN 
+              participacion p ON e.id = p.evento_id AND p.asistente_id = ?
+          WHERE 
+              e.realizado = 0 AND p.evento_id IS NULL;`;
+      const resultados = await this.db.consultar(sql, [id]);
+      return this.mapearResultados(resultados);
+    } catch (error) {
+      console.error("Error al buscar eventos sin confirmar:", error);
+      throw new Error("Error al buscar eventos sin confirmar");
+    }
+  }
+
   mapearResultados(resultados: any[]): IParticipacion[] {
     const participacionesMap: { [key: number]: IParticipacion } = {};
 

@@ -19,6 +19,8 @@ class ParticipacionController {
     this.asistenciaReal = this.asistenciaReal.bind(this); //router para usuario
     this.confirmarAsistencia = this.confirmarAsistencia.bind(this); //router para asistente
     this.partipacionPorEvento = this.partipacionPorEvento.bind(this);
+    this.eventosPorAsistente = this.eventosPorAsistente.bind(this);
+    this.eventosSinConfirmar = this.eventosSinConfirmar.bind(this);
   }
 
   /**
@@ -222,6 +224,71 @@ class ParticipacionController {
     } catch (error) {
       console.error(`Error al obtener el evento con nombre: ${nombre}:`, error);
       res.status(500).json({ error: "Error al obtener el evento" });
+    }
+  }
+
+  /**
+   * Obtiene las participaciones de un asistente por su id.
+   *
+   * @param {Request} req - La petición HTTP que contiene el id del asistente.
+   * @param {Response} res - La respuesta HTTP que contiene las participaciones
+   *                         encontradas o un error.
+   * @returns {Promise<void>} - La promesa que se resuelve cuando se completa la
+   *                            operación de búsqueda.
+   * @throws {Error} - Si ocurre un error al obtener las participaciones del
+   *                  asistente.
+   */
+  async eventosPorAsistente(req: Request, res: Response) {
+    try {
+      const id = req.user?.userId;
+
+      const eventosPorAsistente =
+        await this._repoParticipacion.obtenerPorAsistente(Number(id));
+
+      if (eventosPorAsistente.length === 0) {
+        res
+          .status(404)
+          .json({ error: "No se encontraron eventos para el asistente" });
+        return;
+      }
+      res.status(200).json(eventosPorAsistente);
+    } catch (error) {
+      console.error(
+        `Error al obtener las participaciones del asistente con id ${req.user?.userId}:`,
+        error
+      );
+      res
+        .status(500)
+        .json({ error: "Error al obtener las participaciones del asistente" });
+    }
+  }
+
+  /**
+   * Obtiene los eventos que no han sido confirmados por el asistente
+   * con el id especificado.
+   *
+   * @param {Request} req - La petición HTTP que contiene el id del
+   *                        asistente.
+   * @param {Response} res - La respuesta HTTP que contiene los eventos
+   *                         encontrados o un error.
+   * @returns {Promise<void>} - La promesa que se resuelve cuando se
+   *                            completa la operación de búsqueda.
+   * @throws {Error} - Si ocurre un error al obtener los eventos sin
+   *                  confirmar del asistente.
+   */
+  async eventosSinConfirmar(req: Request, res: Response) {
+    try {
+      const id = req.user?.userId;
+      console.log("IDE DEL USUARIO: " + id);
+      const eventosSinConfirmar =
+        await this._repoParticipacion.eventosSinCnfirmar(Number(id));
+      console.log("Eventos sin confirmar: " + eventosSinConfirmar);
+      res.status(200).json(eventosSinConfirmar);
+    } catch (error) {
+      console.error(`error al listar los eventos sin confirmar `);
+      res
+        .status(500)
+        .json({ error: "Error al listar los eventos sin confirmar" });
     }
   }
 }
