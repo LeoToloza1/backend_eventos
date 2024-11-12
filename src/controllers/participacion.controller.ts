@@ -282,13 +282,6 @@ class ParticipacionController {
       console.log("IDE DEL USUARIO: " + id);
       const eventosSinConfirmar =
         await this._repoParticipacion.eventosSinCnfirmar(Number(id));
-      eventosSinConfirmar.forEach((item) => {
-        console.log("Eventos sin confirmar: " + item.descripcion);
-        console.log("Eventos sin confirmar: " + item.nombre);
-        console.log("Eventos sin confirmar: " + item.fecha);
-        console.log("Eventos sin confirmar: " + item.ubicacion);
-        console.log("Eventos sin confirmar: " + item.realizado);
-      });
       res.status(200).json(eventosSinConfirmar);
     } catch (error) {
       console.error(`error al listar los eventos sin confirmar `);

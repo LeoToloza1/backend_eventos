@@ -248,7 +248,7 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
       WHERE 
           e.realizado = 0 AND p.id IS NULL;`;
       const resultados = await this.db.consultar(sql, [id]);
-      console.log(resultados);
+
       return this.mapearEventos(resultados);
     } catch (error) {
       console.error("Error al buscar eventos sin confirmar:", error);
