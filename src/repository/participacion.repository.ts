@@ -227,28 +227,29 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
    * Obtiene los eventos no confirmados por un asistente específico.
    *
    * @param {number} id - El id del asistente para verificar sus eventos no confirmados.
-   * @returns {Promise<IParticipacion[]>} - Una lista de objetos IParticipacion que representan los eventos
+   * @returns {Promise<IEventos[]>} - Una lista de objetos IParticipacion que representan los eventos
    *                                        no confirmados por el asistente especificado.
    * @throws {Error} - Si ocurre un error al buscar eventos sin confirmar.
    */
 
-  async eventosSinCnfirmar(id: number): Promise<IParticipacion[]> {
+  async eventosSinCnfirmar(id: number): Promise<IEventos[]> {
     try {
       const sql = `SELECT 
-          e.id AS evento_id, 
-          e.nombre AS evento_nombre, 
-          e.ubicacion AS evento_ubicacion, 
-          e.fecha AS evento_fecha, 
-          e.descripcion AS evento_descripcion, 
-          e.realizado AS evento_realizado
-          FROM 
-              eventos e
-          LEFT JOIN 
-              participacion p ON e.id = p.evento_id AND p.asistente_id = ?
-          WHERE 
-              e.realizado = 0 AND p.evento_id IS NULL;`;
+    e.id AS evento_id, 
+    e.nombre AS evento_nombre, 
+    e.ubicacion AS evento_ubicacion, 
+    e.fecha AS evento_fecha, 
+    e.descripcion AS evento_descripcion, 
+    e.realizado AS evento_realizado
+      FROM 
+          eventos e
+      LEFT JOIN 
+          participacion p ON e.id = p.evento_id AND p.asistente_id = ?
+      WHERE 
+          e.realizado = 0 AND p.id IS NULL;`;
       const resultados = await this.db.consultar(sql, [id]);
-      return this.mapearResultados(resultados);
+      console.log(resultados);
+      return this.mapearEventos(resultados);
     } catch (error) {
       console.error("Error al buscar eventos sin confirmar:", error);
       throw new Error("Error al buscar eventos sin confirmar");
@@ -286,6 +287,17 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
     });
 
     return Object.values(participacionesMap);
+  }
+
+  private mapearEventos(resultados: any[]): IEventos[] {
+    return resultados.map((resultado) => ({
+      id: resultado.evento_id || null,
+      nombre: resultado.evento_nombre || null,
+      ubicacion: resultado.evento_ubicacion || null,
+      fecha: resultado.evento_fecha || null,
+      descripcion: resultado.evento_descripcion || null,
+      realizado: resultado.evento_realizado || null,
+    }));
   }
 }
 export default RepoParticipacion;

@@ -283,11 +283,11 @@ class ParticipacionController {
       const eventosSinConfirmar =
         await this._repoParticipacion.eventosSinCnfirmar(Number(id));
       eventosSinConfirmar.forEach((item) => {
-        console.log("Eventos sin confirmar: " + item.id);
-        console.log("Eventos sin confirmar: " + item.asistencia_real);
-        console.log("Eventos sin confirmar: " + item.evento_id);
-        console.log("Eventos sin confirmar: " + item.asistente_id);
-        console.log("Eventos sin confirmar: " + item.confirmacion);
+        console.log("Eventos sin confirmar: " + item.descripcion);
+        console.log("Eventos sin confirmar: " + item.nombre);
+        console.log("Eventos sin confirmar: " + item.fecha);
+        console.log("Eventos sin confirmar: " + item.ubicacion);
+        console.log("Eventos sin confirmar: " + item.realizado);
       });
       res.status(200).json(eventosSinConfirmar);
     } catch (error) {
