@@ -12,7 +12,7 @@ class RepoEvento implements ICrud<IEventos>, IMapeo<IEventos> {
   async obtenerTodos(): Promise<IEventos[]> {
     try {
       const sql =
-        "SELECT id,nombre,ubicacion,DATE_FORMAT(fecha, '%d-%m-%y') AS fecha,descripcion,realizado FROM eventos ORDER BY fecha";
+        "SELECT id,nombre,ubicacion, fecha,descripcion,realizado FROM eventos ORDER BY fecha";
       const resultados = await this.db.consultar(sql);
       return this.mapearResultados(resultados);
     } catch (error) {
@@ -30,7 +30,7 @@ class RepoEvento implements ICrud<IEventos>, IMapeo<IEventos> {
   async obtenerActivos(): Promise<IEventos[]> {
     try {
       const sql =
-        "SELECT id,nombre,ubicacion,DATE_FORMAT(fecha, '%d-%m-%y') AS fecha,descripcion,realizado FROM eventos where realizado = 0 ORDER BY fecha";
+        "SELECT id,nombre,ubicacion, fecha,descripcion,realizado FROM eventos where realizado = 0 ORDER BY fecha";
       const resultados = await this.db.consultar(sql);
       return this.mapearResultados(resultados);
     } catch (error) {
@@ -53,7 +53,7 @@ class RepoEvento implements ICrud<IEventos>, IMapeo<IEventos> {
   async buscarPorId(id: number): Promise<IEventos | null> {
     try {
       const sql =
-        "SELECT id,nombre,ubicacion,DATE_FORMAT(fecha, '%d-%m-%y') AS fecha,descripcion,realizado FROM eventos WHERE id = ?";
+        "SELECT id,nombre,ubicacion, fecha,descripcion,realizado FROM eventos WHERE id = ?";
       const resultados = await this.db.consultar(sql, [id]);
       if (resultados.length === 0) {
         return null;
@@ -142,7 +142,7 @@ class RepoEvento implements ICrud<IEventos>, IMapeo<IEventos> {
       Select id,
         nombre,
         ubicacion,
-        DATE_FORMAT(fecha, '%d-%m-%y') AS fecha,
+         fecha,
         descripcion,
         realizado 
         FROM eventos 
