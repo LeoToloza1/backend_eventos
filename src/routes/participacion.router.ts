@@ -27,6 +27,7 @@ class ParticipacionRouter {
       this._auth.autenticado,
       this.participacionController.eventosPorAsistente
     );
+    this.router.get("/evento-asistentes/:id");
     this.router.get(
       "/sin-confirmar",
       this._auth.autenticado,

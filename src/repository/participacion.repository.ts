@@ -212,10 +212,6 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
       if (resultados.length === 0) {
         return [];
       }
-      console.log(resultados);
-      if (resultados.length === 0) {
-        throw new Error("No se encontraron resultados");
-      }
       return this.mapearResultados(resultados);
     } catch (error) {
       console.error("Error al buscar por asistente:", error);
@@ -253,6 +249,51 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
     } catch (error) {
       console.error("Error al buscar eventos sin confirmar:", error);
       throw new Error("Error al buscar eventos sin confirmar");
+    }
+  }
+
+  /**
+   * Busca los asistentes de un evento específico por su id.
+   *
+   * @param {number} eventoId - El id del evento para buscar sus asistentes.
+   * @returns {Promise<IParticipacion[]>} - Un array de objetos IParticipacion con los asistentes del evento.
+   * @throws {Error} - Si ocurre un error al buscar los asistentes del evento.
+   */
+  async obtenerAsistentesPorEvento(
+    eventoId: number
+  ): Promise<IParticipacion[]> {
+    try {
+      const sql = `
+      SELECT 
+        p.id, 
+        p.confirmacion, 
+        p.asistencia_real, 
+        a.id AS asistente_id, 
+        a.nombre AS asistente_nombre, 
+        a.apellido AS asistente_apellido, 
+        a.email AS asistente_email,
+        a.telefono AS asistente_telefono, 
+        a.dni AS asistente_dni, 
+        e.id AS evento_id, 
+        e.nombre AS evento_nombre, 
+        e.ubicacion AS evento_ubicacion, 
+        e.fecha AS evento_fecha, 
+        e.descripcion AS evento_descripcion, 
+        e.realizado AS evento_realizado
+      FROM participacion p
+      JOIN asistentes a ON p.asistente_id = a.id
+      JOIN eventos e ON p.evento_id = e.id
+      WHERE p.evento_id = ?;
+    `;
+
+      const resultados = await this.db.consultar(sql, [eventoId]);
+      if (resultados.length === 0) {
+        return [];
+      }
+      return this.mapearResultados(resultados);
+    } catch (error) {
+      console.error("Error al buscar los asistentes del evento:", error);
+      throw new Error("Error al buscar los asistentes del evento");
     }
   }
 

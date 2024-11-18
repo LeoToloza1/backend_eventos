@@ -21,6 +21,7 @@ class ParticipacionController {
     this.partipacionPorEvento = this.partipacionPorEvento.bind(this);
     this.eventosPorAsistente = this.eventosPorAsistente.bind(this);
     this.eventosSinConfirmar = this.eventosSinConfirmar.bind(this);
+    this.asistentesPorEvento = this.asistentesPorEvento.bind(this);
   }
 
   /**
@@ -288,6 +289,35 @@ class ParticipacionController {
       res
         .status(500)
         .json({ error: "Error al listar los eventos sin confirmar" });
+    }
+  }
+
+  /**
+   * Obtiene los asistentes de un evento por su id.
+   *
+   * @param {Request} req - La petición HTTP que contiene el id del
+   *                        evento.
+   * @param {Response} res - La respuesta HTTP que contiene los asistentes
+   *                         encontrados o un error.
+   * @returns {Promise<void>} - La promesa que se resuelve cuando se
+   *                            completa la operación de búsqueda.
+   * @throws {Error} - Si ocurre un error al obtener los asistentes del
+   *                  evento.
+   */
+  async asistentesPorEvento(req: Request, res: Response) {
+    try {
+      const id = req.params.id;
+      const result = await this._repoParticipacion.obtenerAsistentesPorEvento(
+        Number(id)
+      );
+      res.status(200).json(result);
+    } catch (error) {
+      console.error(
+        `No se pudo recuperar los asistentes del evento ${req.params.id}`
+      );
+      res.status(404).json({
+        error: `No se pudo recuperar los asistentes del evento ${req.params.id}`,
+      });
     }
   }
 }
