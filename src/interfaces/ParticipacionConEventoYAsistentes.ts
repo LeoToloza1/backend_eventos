@@ -1,4 +1,5 @@
 export interface IAsistenteEvento {
+  id: number;
   nombre: string;
   apellido: string;
   email: string;

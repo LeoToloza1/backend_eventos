@@ -314,6 +314,7 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
     resultados.forEach((row) => {
       if (row.asistente_id) {
         const asistente: IAsistenteEvento = {
+          id: row.asistente_id,
           nombre: row.asistente_nombre,
           apellido: row.asistente_apellido,
           email: row.asistente_email,
