@@ -259,42 +259,72 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
    * @returns {Promise<IParticipacion[]>} - Un array de objetos IParticipacion con los asistentes del evento.
    * @throws {Error} - Si ocurre un error al buscar los asistentes del evento.
    */
-  async obtenerAsistentesPorEvento(
-    eventoId: number
-  ): Promise<IParticipacion[]> {
+  async obtenerAsistentesPorEvento(eventoId: number): Promise<any> {
     try {
       const sql = `
-      SELECT 
-        p.id, 
-        p.confirmacion, 
-        p.asistencia_real, 
-        a.id AS asistente_id, 
-        a.nombre AS asistente_nombre, 
-        a.apellido AS asistente_apellido, 
-        a.email AS asistente_email,
-        a.telefono AS asistente_telefono, 
-        a.dni AS asistente_dni, 
-        e.id AS evento_id, 
-        e.nombre AS evento_nombre, 
-        e.ubicacion AS evento_ubicacion, 
-        e.fecha AS evento_fecha, 
-        e.descripcion AS evento_descripcion, 
-        e.realizado AS evento_realizado
-      FROM participacion p
-      JOIN asistentes a ON p.asistente_id = a.id
-      JOIN eventos e ON p.evento_id = e.id
-      WHERE p.evento_id = ?;
-    `;
+        SELECT 
+          e.id AS evento_id, 
+          e.nombre AS evento_nombre, 
+          e.ubicacion AS evento_ubicacion, 
+          e.fecha AS evento_fecha, 
+          e.descripcion AS evento_descripcion, 
+          e.realizado AS evento_realizado, 
+          p.id AS participacion_id,
+          p.confirmacion, 
+          p.asistencia_real, 
+          a.id AS asistente_id, 
+          a.nombre AS asistente_nombre, 
+          a.apellido AS asistente_apellido, 
+          a.email AS asistente_email,
+          a.telefono AS asistente_telefono, 
+          a.dni AS asistente_dni
+        FROM eventos e
+        LEFT JOIN participacion p ON e.id = p.evento_id
+        LEFT JOIN asistentes a ON p.asistente_id = a.id
+        WHERE e.id = ?;
+      `;
 
       const resultados = await this.db.consultar(sql, [eventoId]);
+
       if (resultados.length === 0) {
-        return [];
+        return null; // O puedes devolver un objeto vacío con estructura esperada
       }
-      return this.mapearResultados(resultados);
+
+      // Mapear los resultados para agrupar los asistentes bajo el evento
+      const evento = this.mapearEventoConAsistentes(resultados);
+      return evento;
     } catch (error) {
       console.error("Error al buscar los asistentes del evento:", error);
       throw new Error("Error al buscar los asistentes del evento");
     }
+  }
+
+  private mapearEventoConAsistentes(resultados: any[]): any {
+    const evento = {
+      id: resultados[0].evento_id,
+      nombre: resultados[0].evento_nombre,
+      ubicacion: resultados[0].evento_ubicacion,
+      fecha: resultados[0].evento_fecha,
+      descripcion: resultados[0].evento_descripcion,
+      realizado: resultados[0].evento_realizado,
+      asistentes: [] as any[],
+    };
+
+    resultados.forEach((row) => {
+      if (row.asistente_id) {
+        evento.asistentes.push({
+          nombre: row.asistente_nombre,
+          apellido: row.asistente_apellido,
+          email: row.asistente_email,
+          telefono: row.asistente_telefono,
+          dni: row.asistente_dni,
+          confirmacion: row.confirmacion,
+          asistencia_real: row.asistencia_real,
+        });
+      }
+    });
+
+    return evento;
   }
 
   mapearResultados(resultados: any[]): IParticipacion[] {
