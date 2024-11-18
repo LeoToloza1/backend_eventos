@@ -312,6 +312,7 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
     };
 
     resultados.forEach((row) => {
+      console.log(row);
       if (row.asistente_id) {
         const asistente: IAsistenteEvento = {
           id: row.asistente_id,
@@ -323,7 +324,6 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
           confirmacion: row.confirmacion,
           asistencia_real: row.asistencia_real ?? null,
         };
-
         eventoAsistente.asistentes.push(asistente);
       }
     });
