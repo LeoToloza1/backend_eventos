@@ -1,4 +1,9 @@
 import Conectar from "../db/config_db";
+import {
+  IAsistenteEvento,
+  IEventoConAsistentes,
+} from "../interfaces/ParticipacionConEventoYAsistentes";
+
 class RepoParticipacion implements IMapeo<IParticipacion> {
   constructor(private readonly db: Conectar) {}
 
@@ -263,15 +268,15 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
     try {
       const sql = `
         SELECT 
-          e.id AS evento_id, 
+          p.id,
+          p.confirmacion, 
+          p.asistencia_real,
+          e.id as evento_id,
           e.nombre AS evento_nombre, 
           e.ubicacion AS evento_ubicacion, 
           e.fecha AS evento_fecha, 
           e.descripcion AS evento_descripcion, 
           e.realizado AS evento_realizado, 
-          p.id AS participacion_id,
-          p.confirmacion, 
-          p.asistencia_real, 
           a.id AS asistente_id, 
           a.nombre AS asistente_nombre, 
           a.apellido AS asistente_apellido, 
@@ -283,14 +288,10 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
         LEFT JOIN asistentes a ON p.asistente_id = a.id
         WHERE e.id = ?;
       `;
-
       const resultados = await this.db.consultar(sql, [eventoId]);
-
       if (resultados.length === 0) {
-        return null; // O puedes devolver un objeto vacío con estructura esperada
+        return null;
       }
-
-      // Mapear los resultados para agrupar los asistentes bajo el evento
       const evento = this.mapearEventoConAsistentes(resultados);
       return evento;
     } catch (error) {
@@ -299,32 +300,34 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
     }
   }
 
-  private mapearEventoConAsistentes(resultados: any[]): any {
-    const evento = {
+  private mapearEventoConAsistentes(resultados: any[]): IEventoConAsistentes {
+    const eventoAsistente: IEventoConAsistentes = {
       id: resultados[0].evento_id,
       nombre: resultados[0].evento_nombre,
       ubicacion: resultados[0].evento_ubicacion,
       fecha: resultados[0].evento_fecha,
       descripcion: resultados[0].evento_descripcion,
       realizado: resultados[0].evento_realizado,
-      asistentes: [] as any[],
+      asistentes: [],
     };
 
     resultados.forEach((row) => {
       if (row.asistente_id) {
-        evento.asistentes.push({
+        const asistente: IAsistenteEvento = {
           nombre: row.asistente_nombre,
           apellido: row.asistente_apellido,
           email: row.asistente_email,
           telefono: row.asistente_telefono,
           dni: row.asistente_dni,
           confirmacion: row.confirmacion,
-          asistencia_real: row.asistencia_real,
-        });
+          asistencia_real: row.asistencia_real ?? null,
+        };
+
+        eventoAsistente.asistentes.push(asistente);
       }
     });
 
-    return evento;
+    return eventoAsistente;
   }
 
   mapearResultados(resultados: any[]): IParticipacion[] {
