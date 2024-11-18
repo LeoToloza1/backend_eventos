@@ -29,6 +29,8 @@ class ParticipacionRouter {
     );
     this.router.get(
       "/evento-asistentes/:id",
+      this._auth.autenticado,
+      this._auth.verificarRol(["usuario"]),
       this.participacionController.asistentesPorEvento
     );
     this.router.get(
