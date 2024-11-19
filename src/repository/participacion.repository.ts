@@ -103,7 +103,8 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
    */
   async asistenciaReal(id: number): Promise<boolean> {
     try {
-      const sql = "UPDATE participacion SET asistencia_real = ? WHERE id = ?";
+      const sql =
+        "UPDATE participacion SET asistencia_real = true WHERE asistente_id = ?";
       const asistenciaReal = true;
       await this.db.consultar(sql, [asistenciaReal, id]);
       return true;

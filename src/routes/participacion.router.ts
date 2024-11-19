@@ -70,7 +70,7 @@ class ParticipacionRouter {
     );
 
     this.router.patch(
-      "/realizado/:id",
+      "/realizado",
       this._auth.autenticado,
       this._auth.verificarRol(["usuario"]),
       this.participacionController.asistenciaReal
