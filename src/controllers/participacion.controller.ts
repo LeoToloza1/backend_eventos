@@ -159,7 +159,8 @@ class ParticipacionController {
    * @throws {Error} - Si ocurre un error al marcar la participacion como realizada.
    */
   async asistenciaReal(_req: Request, res: Response): Promise<void> {
-    const { id } = _req.body;
+    const id = _req.body;
+    console.log("ENTRADA desde el front -->" + _req.body);
     try {
       const resultado = await this._repoParticipacion.asistenciaReal(
         Number(id)

@@ -102,9 +102,10 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
    * @throws {Error} - Si ocurre un error al marcar la participacion como realizada.
    */
   async asistenciaReal(id: number): Promise<boolean> {
+    console.log("ID DEL ASISTENTE: "+id);
     try {
       const sql =
-        "UPDATE participacion SET asistencia_real = 1 WHERE asistente_id = ?";
+        "UPDATE participacion SET asistencia_real = ? WHERE asistente_id = ?";
       const asistenciaReal = true;
       await this.db.consultar(sql, [asistenciaReal, id]);
       return true;
