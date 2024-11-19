@@ -11,6 +11,7 @@ export interface IAsistenteEvento {
 
 export interface IEventoConAsistentes {
   id: number;
+  evento_id: number;
   nombre: string;
   ubicacion: string;
   fecha: Date;
