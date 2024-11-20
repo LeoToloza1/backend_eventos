@@ -39,6 +39,12 @@ class ParticipacionRouter {
       this.participacionController.eventosSinConfirmar
     );
     this.router.get(
+      "/certificado/:id",
+      this._auth.autenticado,
+      this._auth.verificarRol(["asistente"]),
+      this.participacionController.generarCertificado
+    );
+    this.router.get(
       "/:id",
       this._auth.autenticado,
       this.participacionController.getId
@@ -74,12 +80,6 @@ class ParticipacionRouter {
       this._auth.autenticado,
       this._auth.verificarRol(["usuario"]),
       this.participacionController.asistenciaReal
-    );
-    this.router.get(
-      "/certificado/:id",
-      this._auth.autenticado,
-      this._auth.verificarRol(["asistente"]),
-      this.participacionController.generarCertificado
     );
   }
 
