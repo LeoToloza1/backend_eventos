@@ -14,7 +14,7 @@ export class PdfService {
   generarCertificado(asistente: IPersona, evento: IEventos): string {
     const doc = new PDFDocument();
     const fileName = `certificado_${asistente.nombre}_${Date.now()}.pdf`;
-    const filePath = path.join(__dirname, "../files", fileName);
+    const filePath = path.join(__dirname, "../public/certificados", fileName);
     const dir = path.dirname(filePath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
