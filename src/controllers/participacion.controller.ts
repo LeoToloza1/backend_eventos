@@ -325,7 +325,19 @@ class ParticipacionController {
     }
   }
 
-  //EN_PROCESO
+  /**
+   * Genera un certificado de participación en un evento
+   *
+   * @param {Request} req - La petición HTTP que contiene el id de la
+   *                        participación.
+   * @param {Response} res - La respuesta HTTP que contiene la ruta
+   *                         absoluta del archivo PDF generado o un error.
+   * @returns {Promise<void>} - La promesa que se resuelve cuando se
+   *                            completa la operación de generación del
+   *                            certificado.
+   * @throws {Error} - Si ocurre un error al generar el certificado del
+   *                  asistente.
+   */
   async generarCertificado(req: Request, res: Response) {
     try {
       const idParticipacion = req.params.id;
