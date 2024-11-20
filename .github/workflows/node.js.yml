@@ -46,6 +46,7 @@ jobs:
           cp package.json salida/
           cp package-lock.json salida/
           cp index.html salida/
+          cp calendario.ico salida/
       
       # - name: Instalar dependencias en la carpeta de salida ⌛
       #   working-directory: ./salida
