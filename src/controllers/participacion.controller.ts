@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import RepoParticipacion from "../repository/participacion.repository";
+import { PdfService } from "../services/pdf.service";
 
 class ParticipacionController {
   private readonly _repoParticipacion: RepoParticipacion;
+  private readonly pdf: PdfService;
 
   /**
    * Constructor de la clase ParticipacionController.
@@ -11,6 +13,7 @@ class ParticipacionController {
    */
   constructor(RepoParticipacion: RepoParticipacion) {
     this._repoParticipacion = RepoParticipacion;
+    this.pdf = new PdfService();
     this.getAll = this.getAll.bind(this);
     this.getId = this.getId.bind(this);
     this.post = this.post.bind(this); //usuario asistente
@@ -22,6 +25,7 @@ class ParticipacionController {
     this.eventosPorAsistente = this.eventosPorAsistente.bind(this);
     this.eventosSinConfirmar = this.eventosSinConfirmar.bind(this);
     this.asistentesPorEvento = this.asistentesPorEvento.bind(this);
+    this.generarCertificado = this.generarCertificado.bind(this);
   }
 
   /**
@@ -318,6 +322,31 @@ class ParticipacionController {
       res.status(404).json({
         error: `No se pudo recuperar los asistentes del evento ${req.params.id}`,
       });
+    }
+  }
+
+  //EN_PROCESO
+  async generarCertificado(req: Request, res: Response) {
+    try {
+      const idParticipacion = req.params.id;
+      const participacion = await this._repoParticipacion.buscarPorId(
+        Number(idParticipacion)
+      );
+      if (!participacion || !participacion.asistente || !participacion.evento) {
+        throw new Error("Datos incompletos para generar el certificado.");
+      }
+      const asistente = participacion.asistente;
+      const evento = participacion.evento;
+      const filePath = this.pdf.generarCertificado(asistente, evento);
+      res.status(200).json({ msj: "Certificado generado con éxito", filePath });
+    } catch (error) {
+      console.error(
+        `Error al generar el certificado del asistente con id ${req.user?.userId}:`,
+        error
+      );
+      res
+        .status(500)
+        .json({ error: "Error al generar el certificado del asistente" });
     }
   }
 }

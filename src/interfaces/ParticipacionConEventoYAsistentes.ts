@@ -1,5 +1,6 @@
 export interface IAsistenteEvento {
   id: number;
+  asistente_id: number;
   nombre: string;
   apellido: string;
   email: string;
@@ -10,7 +11,6 @@ export interface IAsistenteEvento {
 }
 
 export interface IEventoConAsistentes {
-  id: number;
   evento_id: number;
   nombre: string;
   ubicacion: string;

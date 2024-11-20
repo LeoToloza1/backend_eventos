@@ -75,6 +75,12 @@ class ParticipacionRouter {
       this._auth.verificarRol(["usuario"]),
       this.participacionController.asistenciaReal
     );
+    this.router.post(
+      "/certificado/:id",
+      this._auth.autenticado,
+      this._auth.verificarRol(["asistente"]),
+      this.participacionController.generarCertificado
+    );
   }
 
   getRouter(): Router {

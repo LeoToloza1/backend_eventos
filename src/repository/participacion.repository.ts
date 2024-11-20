@@ -29,7 +29,7 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
       throw new Error("Error al obtener todos los participaciones");
     }
   }
-  async buscarPorId(id: number): Promise<IParticipacion | null> {
+  async buscarPorId(id: number): Promise<IParticipacion> {
     try {
       const sql = `SELECT 
         p.id, p.confirmacion, p.asistencia_real, 
@@ -44,7 +44,7 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
       JOIN eventos e ON p.evento_id = e.id WHERE p.id = ?`;
       const resultados = await this.db.consultar(sql, [id]);
       if (resultados.length === 0) {
-        return null;
+        throw new Error("Error al buscar por id un evento");
       }
       return this.mapearResultados(resultados)[0];
     } catch (error) {
@@ -303,7 +303,6 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
 
   private mapearEventoConAsistentes(resultados: any[]): IEventoConAsistentes {
     const eventoAsistente: IEventoConAsistentes = {
-      id: resultados[0].id,
       evento_id: resultados[0].evento_id,
       nombre: resultados[0].evento_nombre,
       ubicacion: resultados[0].evento_ubicacion,
@@ -314,10 +313,10 @@ class RepoParticipacion implements IMapeo<IParticipacion> {
     };
 
     resultados.forEach((row) => {
-      console.log(row);
       if (row.asistente_id) {
         const asistente: IAsistenteEvento = {
-          id: row.asistente_id,
+          id: resultados[resultados.indexOf(row)].id,
+          asistente_id: row.asistente_id,
           nombre: row.asistente_nombre,
           apellido: row.asistente_apellido,
           email: row.asistente_email,
