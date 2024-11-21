@@ -280,9 +280,9 @@ class AsistenteController {
    */
   async cambiarContraseña(req: Request, res: Response): Promise<void> {
     const passwordNueva = req.body;
-    const email = req.user?.userEmail || "";
+    const id = req.user?.userId;
     try {
-      const asistente = await this._repoAsistente.obtenerPorEmail(email);
+      const asistente = await this._repoAsistente.buscarPorId(Number(id));
 
       if (!asistente) {
         res.status(404).json({ message: "Usuario no encontrado." });

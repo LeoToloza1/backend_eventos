@@ -256,9 +256,9 @@ class UsuarioController {
    */
   async cambiarContraseña(req: Request, res: Response): Promise<void> {
     const passwordNueva = req.body;
-    const email = req.user?.userEmail || "";
+    const id = req.user?.userId;
     try {
-      const usuario = await this._repoUsuario.obtenerPorEmail(email);
+      const usuario = await this._repoUsuario.buscarPorId(Number(id));
 
       if (!usuario) {
         res.status(404).json({ message: "Usuario no encontrado." });
