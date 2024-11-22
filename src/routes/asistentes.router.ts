@@ -44,8 +44,9 @@ class AsistenteRouter {
       this.asistenteController.put
     ); //✅
     this.router.patch(
-      "/parcial/:id",
+      "/parcial",
       this._auth.autenticado,
+      this._auth.verificarRol(["asistente"]),
       this.asistenteController.patch
     ); //✅
     this.router.patch(

@@ -48,6 +48,7 @@ class UsuarioRouter {
     this.router.patch(
       "/parcial",
       this._auth.autenticado,
+      this._auth.verificarRol(["usuario"]),
       this.usuarioController.patch
     ); //✅
     this.router.patch("/recuperar_pass", this.usuarioController.recueprarPass); //✅ recuperar contrasñea mediante email
