@@ -29,9 +29,9 @@ class UsuarioRouter {
       this.usuarioController.getAll
     ); //✅
     this.router.post("/login", this.usuarioController.loginUsuario);
-    this.router.get("/recuperar-pass", this.usuarioController.recueprarPass); //✅ recuperar contrasñea mediante email
+    this.router.post("/recuperar-pass", this.usuarioController.recueprarPass); //✅ recuperar contrasñea mediante email
     this.router.patch(
-      "/cambiar-pass",
+      "/password",
       this._auth.autenticado,
       this.usuarioController.cambiarContraseña
     );

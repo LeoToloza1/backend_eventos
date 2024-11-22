@@ -31,7 +31,7 @@ class AsistenteRouter {
       this.asistenteController.getAll
     ); //✅
     this.router.post("/login", this.asistenteController.loginAsistente);
-    this.router.get(
+    this.router.post(
       "/recuperar-password",
       this.asistenteController.recuperarPass
     ); //✅ recupero de contraseña por email
