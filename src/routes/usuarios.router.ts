@@ -29,6 +29,12 @@ class UsuarioRouter {
       this.usuarioController.getAll
     ); //✅
     this.router.post("/login", this.usuarioController.loginUsuario);
+    this.router.get("/recuperar-pass", this.usuarioController.recueprarPass); //✅ recuperar contrasñea mediante email
+    this.router.patch(
+      "/cambiar-pass",
+      this._auth.autenticado,
+      this.usuarioController.cambiarContraseña
+    );
     this.router.get(
       "/:id",
       this._auth.autenticado,
@@ -51,12 +57,7 @@ class UsuarioRouter {
       this._auth.verificarRol(["usuario"]),
       this.usuarioController.patch
     ); //✅
-    this.router.patch("/recuperar_pass", this.usuarioController.recueprarPass); //✅ recuperar contrasñea mediante email
-    this.router.patch(
-      "/cambiar_pass",
-      this._auth.autenticado,
-      this.usuarioController.cambiarContraseña
-    );
+
     this.router.get(
       "/perfil",
       this._auth.autenticado,

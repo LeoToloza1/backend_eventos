@@ -32,6 +32,15 @@ class AsistenteRouter {
     ); //✅
     this.router.post("/login", this.asistenteController.loginAsistente);
     this.router.get(
+      "/recuperar-password",
+      this.asistenteController.recuperarPass
+    ); //✅ recupero de contraseña por email
+    this.router.patch(
+      "/password",
+      this._auth.autenticado,
+      this.asistenteController.cambiarContraseña
+    ); //✅ cambiar contraseña
+    this.router.get(
       "/:id",
       this._auth.autenticado,
       this._auth.verificarRol(["usuario", "asistente"]),
@@ -49,15 +58,7 @@ class AsistenteRouter {
       this._auth.verificarRol(["asistente"]),
       this.asistenteController.patch
     ); //✅
-    this.router.patch(
-      "/recuperar_password",
-      this.asistenteController.recuperarPass
-    ); //✅ recupero de contraseña por email
-    this.router.patch(
-      "/password",
-      this._auth.autenticado,
-      this.asistenteController.cambiarContraseña
-    ); //✅ cambiar contraseña
+
     this.router.get(
       "/perfil",
       this._auth.autenticado,
